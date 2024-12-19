@@ -1,0 +1,63 @@
+services:
+  assets:
+    build:
+      dockerfile: docker/nginx/Dockerfile.dev
+      context: ./webapp
+      target: assets_dev
+    volumes:
+      - "./webapp:/app:cached"
+      - "assets-build:/data/public/build"
+
+  nginx:
+    networks:
+      default:
+        aliases:
+          - aristote-plume-local.centralesupelec.fr
+    build:
+      context: ./webapp
+      dockerfile: docker/nginx/Dockerfile.dev
+      target: nginx_dev
+    depends_on:
+      - php
+      - assets
+    environment:
+      PHP_BACKEND: php
+    volumes:
+      - "./webapp:/app:ro"
+      - "assets-build:/data/public/build"
+    ports:
+      - "80:80"
+      - "443:443"
+
+  php:
+    build:
+      dockerfile: docker/php/Dockerfile
+      context: ./webapp
+      target: php_dev
+    command:
+      - php-fpm
+#      - -d xdebug.mode=debug # uncomment this line (and remove + restart container) to enable xdebug step debugger
+    depends_on:
+      - postgres
+#      - redis
+    volumes:
+      - "./webapp:/app:cached"
+      - "./webapp/var/cache:/app/var/cache:delegated"
+      - "./webapp/var/log:/app/var/log:delegated"
+      - "./webapp/vendor:/app/vendor:delegated"
+
+  postgres:
+    image: postgres:16
+    restart: on-failure
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: plume
+      POSTGRES_PASSWORD: plume
+      POSTGRES_DB: plume
+    ports:
+      - "5432:5432"
+
+volumes:
+  assets-build:
+  postgres-data:
