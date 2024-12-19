@@ -23,17 +23,6 @@ class SynchronizedMigrationCommand extends Command
         $this->lock = $lockFactory->createLock('database-migration');
     }
 
-    protected function configure(): void
-    {
-        parent::configure();
-
-        $this
-            ->setDescription('Doctrine migration with lock')
-            ->addOption('conn', null, InputOption::VALUE_REQUIRED, 'The database connection to use for this command.')
-            ->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
-            ->addOption('shard', null, InputOption::VALUE_REQUIRED, 'The shard connection to use for this command.');
-    }
-
     /**
      * @throws Exception
      */
@@ -55,11 +44,23 @@ class SynchronizedMigrationCommand extends Command
         if ($input->getOption('shard')) {
             $arguments['--shard'] = $input->getOption('shard');
         }
-        $newInput = new ArrayInput(array_merge(
+        $arrayInput = new ArrayInput(array_merge(
             $arguments
         ));
-        $newInput->setInteractive(false);
+        $arrayInput->setInteractive(false);
 
-        return $app->run($newInput, $output);
+        return $app->run($arrayInput, $output);
+    }
+
+    protected function configure(): void
+    {
+        parent::configure();
+
+        $this
+            ->setDescription('Doctrine migration with lock')
+            ->addOption('conn', null, InputOption::VALUE_REQUIRED, 'The database connection to use for this command.')
+            ->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
+            ->addOption('shard', null, InputOption::VALUE_REQUIRED, 'The shard connection to use for this command.')
+        ;
     }
 }
