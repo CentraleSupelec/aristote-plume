@@ -38,6 +38,18 @@
             ".php-cs-fixer.dist.php"
         ]
     },
+    "friendsofsymfony/jsrouting-bundle": {
+        "version": "3.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "2.3",
+            "ref": "a9f2e49180f75cdc71ae279a929c4b2e0638de84"
+        },
+        "files": [
+            "config/routes/fos_js_routing.yaml"
+        ]
+    },
     "knplabs/knp-menu-bundle": {
         "version": "v3.4.2"
     },
@@ -307,7 +319,7 @@
             "ref": "6acd9ff4f7fd5626d2962109bd4ebab351d43c43"
         },
         "files": [
-            "assets/bootstrap.js",
+            "assets/bootstrap.ts",
             "assets/controllers.json",
             "assets/controllers/hello_controller.js"
         ]
@@ -359,7 +371,7 @@
             "ref": "e970076b31d602ae6e2106cf91a82c7e1f7ddff2"
         },
         "files": [
-            "assets/react/controllers/Hello.jsx"
+            "assets/react/controllers/Hello.tsx"
         ]
     },
     "symfony/validator": {
@@ -396,7 +408,7 @@
             "ref": "35ee1edee91a1a7137095f53db7ed0c20884b745"
         },
         "files": [
-            "assets/app.js",
+            "assets/app.ts",
             "assets/styles/app.css",
             "config/packages/webpack_encore.yaml",
             "package.json",
