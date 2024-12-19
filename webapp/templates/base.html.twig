@@ -1,5 +1,6 @@
+{% set locale = app.request.locale|slice(0, 2) %}
 <!DOCTYPE html>
-<html>
+<html lang="{{ locale }}">
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
@@ -10,7 +11,9 @@
 
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script>
+                window.locale = '{{ locale }}';
+            </script>
         {% endblock %}
     </head>
     <body>

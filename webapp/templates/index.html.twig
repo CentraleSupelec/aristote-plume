@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="text-center mb-2">
+            <img style="max-width: 140px" src="{{ asset('build/images/app-logo.png') }}" alt="{{ app_name }}-logo">
+        </div>
+        <div class="row justify-content-center mb-4">
+            <div class="col-12 col-md-10 col-lg-8 text-center">
+                <h1>
+                    {{ 'home.title' | trans }}
+                </h1>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mb-4">
+            <div class="col-12">
+                <h2 class="px-3">
+                    {{ 'home.subtitle' | trans }}
+                </h2>
+                <p class="px-3">
+                    {{ 'home.description' | trans }}
+                </p>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center">
+            <div class="col-12 col-md-6 col-lg-5 col-xl-4 mt-3">
+                <div class="card mb-5 mx-0 mx-md-3 mb-md-0 lift lift-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h4 text-center my-2 fs-5">
+                            {{ 'home.title' | trans }}
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">
+                            {{ 'home.description' | trans }}
+                        </p>
+
+                        <a href="#" class="text-decoration-none stretched-link">
+                           {{ 'home.link_to_app' | trans }}
+                            <i class="fas fa-fw fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

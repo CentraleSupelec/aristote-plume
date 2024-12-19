@@ -1,0 +1,12 @@
+snc_redis:
+  clients:
+    session:
+      type: phpredis
+      alias: session
+      dsn: "%env(REDIS_URL)%/1"
+      logging: '%kernel.debug%'
+#    cache:
+#      type: phpredis
+#      alias: cache
+#      dsn: "%env(REDIS_URL)%/2"
+#      logging: '%kernel.debug%'

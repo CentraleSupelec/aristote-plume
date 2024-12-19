@@ -1,0 +1,8 @@
+[config/**.{yaml,yml}]
+indent_size = 2
+
+[translations/*.{yaml,yml}]
+indent_size = 2
+
+[*.scss]
+indent_size = 2

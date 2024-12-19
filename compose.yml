@@ -39,7 +39,7 @@ services:
 #      - -d xdebug.mode=debug # uncomment this line (and remove + restart container) to enable xdebug step debugger
     depends_on:
       - postgres
-#      - redis
+      - redis
     volumes:
       - "./webapp:/app:cached"
       - "./webapp/var/cache:/app/var/cache:delegated"
@@ -58,6 +58,16 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:7.4
+    restart: on-failure
+    command: redis-server --requirepass redis_password
+    expose:
+      - 6379
+    volumes:
+      - redis-data:/data
+
 volumes:
   assets-build:
   postgres-data:
+  redis-data:

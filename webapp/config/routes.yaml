@@ -3,3 +3,9 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+administrator_login_check:
+  path: /admin/login_check
+
+administrator_logout:
+  path: /admin/logout

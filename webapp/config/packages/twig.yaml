@@ -1,6 +1,11 @@
 twig:
-    file_name_pattern: '*.twig'
+  default_path: '%kernel.project_dir%/templates'
+  file_name_pattern: '*.twig'
+  globals:
+    locales:
+      - fr
+    app_name: '%app_name%'
 
 when@test:
-    twig:
-        strict_variables: true
+  twig:
+    strict_variables: true

@@ -1,0 +1,22 @@
+menu:
+  logout: Se déconnecter
+  locale:
+    switch_aria_label: Changer de langue
+    fr: Français
+    en: English
+
+error:
+  title: Erreur
+  access_denied:
+    title: Vous n'avez pas accès à cette page
+    connected_as:
+      admin: Vous êtes connecté en tant qu'administrateur.
+      unknown: --
+    disconnected: Vous n'êtes pas connecté.
+  back_to_home: Retour à l'accueil
+
+home:
+  title: Plume
+  subtitle: Le module de génération d'articles d'Aristote
+  description: Avec Plume, rédigez des synthèses scientifiques au format "article Wikipédia"
+  link_to_app: Accéder à l'application
