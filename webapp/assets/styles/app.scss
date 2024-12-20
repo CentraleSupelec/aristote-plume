@@ -5,3 +5,15 @@ $body-bg: #f9fbfd !default;
 $badge-color: black !default;
 
 @import "~bootstrap/scss/bootstrap";
+
+#body-wrapper {
+  min-height: 100%;
+}
+
+#main {
+  overflow: auto;
+}
+
+.application-logo-navbar {
+  height: 40px;
+}

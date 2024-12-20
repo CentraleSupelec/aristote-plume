@@ -1,0 +1,29 @@
+{% include '_impersonation_warning_header.html.twig' %}
+
+<div class="d-flex d-print-none flex-row align-items-center px-md-4 mb-4 justify-content-between border-bottom header">
+    <div class="d-flex align-items-center">
+        <a {% if app.user %}href="{{ path('home') }}" {% else %} href="{{ path('home') }}" {% endif %}>
+            <img class="application-logo-navbar" src="{{ asset('build/images/app-logo.png') }}" alt="{{ app_name }}">
+        </a>
+        <p class="h5 my-0 ms-3 font-weight-normal d-md-inline d-none">
+            {{ 'home.title' | trans }}
+        </p>
+    </div>
+
+    <nav class="my-2 my-md-0 mr-md-3 d-flex align-items-center">
+        {% if app.user %}
+            <small class="me-2 text-muted">
+                {{ app.user.useridentifier }}
+            </small>
+            <a
+                class="btn btn-link p-2 text-decoration-none gray-link"
+                href="{{ logout_path() }}"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                title="{{ 'menu.logout' | trans }}"
+            >
+                <i class="fas fa-fw fa-power-off" data-fa-transform="grow-4"></i>
+            </a>
+        {% endif %}
+    </nav>
+</div>

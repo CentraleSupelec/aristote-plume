@@ -20,3 +20,31 @@ home:
   subtitle: Le module de génération d'articles d'Aristote
   description: Avec Plume, rédigez des synthèses scientifiques au format "article Wikipédia"
   link_to_app: Accéder à l'application
+
+app_home:
+  title: Rédigez votre article avec Plume
+
+article:
+  type:
+    economics: Économie
+    literature: Littérature
+    science: Sciences
+  generation_model:
+    aristote: Aristote (Llama 3.0 70B)
+  language:
+    fr: Français
+    en: Anglais
+    query: Langue de la question
+  form:
+    requested_topic:
+      label: Objet de la rédaction
+    requested_type:
+      label: Type de document
+      placeholder: -- Sélectionner un type --
+    requested_language:
+      label: Langue
+      placeholder: -- Sélectionner une langue --
+    requested_language_model:
+      label: Modèle de langue
+      placeholder: -- Sélectionner un modèle --
+    submit: Lancer la rédaction

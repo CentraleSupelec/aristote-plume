@@ -17,7 +17,11 @@
         {% endblock %}
     </head>
     <body>
-        {% include '_impersonation_warning_header.html.twig' %}
-        {% block body %}{% endblock %}
+        <div id="body-wrapper">
+            {% include '_navbar.html.twig' %}
+            <div id="main">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
     </body>
 </html>
