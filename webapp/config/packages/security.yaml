@@ -2,16 +2,19 @@ security:
   providers:
     administrator:
       id: App\Security\Administrator\AdministratorProvider
+    plume_user:
+      id: App\Security\PlumeUser\PlumeUserProvider
   firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
     administrator_secured_area:
-      pattern: /admin
+      pattern: ^/admin
       context: main
       provider: administrator
       user_checker: App\Security\UserChecker
-      access_denied_url: admin_access_denied
+      access_denied_url: administrator_access_denied
+      switch_user: true
       oidc:
         client: administrator
         login_path: administrator_login_oidc
@@ -22,6 +25,23 @@ security:
       logout:
         path: administrator_logout
         target: home
+    plume_user_secured_area:
+      pattern: ^/app
+      context: main
+      provider: plume_user
+      user_checker: App\Security\UserChecker
+      switch_user: { role: ROLE_SUPER_ADMIN, parameter: _switch_user }
+      access_denied_url: plume_user_access_denied
+      oidc:
+        client: plume_user
+        login_path: plume_user_login_oidc
+        check_path: plume_user_login_check
+        user_identifier_property: '%oidc_user_identifier_property%'
+        enable_end_session_listener: true
+        user_identifier_from_idtoken: '%oidc_user_identifier_from_id_token%'
+      logout:
+        path: plume_user_logout
+        target: home
 
   access_control:
     # Admin area
@@ -30,9 +50,15 @@ security:
     - { path: ^/admin/login_check, role: PUBLIC_ACCESS }
     - { path: ^/admin/forbidden$, role: PUBLIC_ACCESS }
     - { path: ^/admin, role: ROLE_SUPER_ADMIN }
+    # App area
+    - { path: ^/app/login_oidc, role: PUBLIC_ACCESS }
+    - { path: ^/app/logout$, role: PUBLIC_ACCESS }
+    - { path: ^/app/login_check, role: PUBLIC_ACCESS }
+    - { path: ^/app/forbidden$, role: PUBLIC_ACCESS }
+    - { path: ^/app, role: ROLE_PLUME_USER }
 
   role_hierarchy:
     ROLE_USER: PUBLIC_ACCESS
     ROLE_PLUME_USER: ROLE_USER
     ROLE_ADMIN: ROLE_PLUME_USER
-    ROLE_SUPER_ADMIN: ROLE_ADMIN
+    ROLE_SUPER_ADMIN: ROLE_ADMIN, ROLE_SONATA_ADMIN, ROLE_ALLOWED_TO_SWITCH

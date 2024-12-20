@@ -19,12 +19,23 @@ class SecurityController extends AbstractController
      */
     #[Route('/admin/login_oidc', name: 'administrator_login_oidc')]
     #[IsGranted('PUBLIC_ACCESS')]
-    public function administratorsLoginOidc(OidcClientInterface $administratorOidcClient): RedirectResponse
+    public function administratorLoginOidc(OidcClientInterface $administratorOidcClient): RedirectResponse
     {
         return $administratorOidcClient->generateAuthorizationRedirect(null, $this->getParameter('oidc_scopes'));
     }
 
+    /**
+     * @throws OidcConfigurationException|OidcConfigurationResolveException|OidcCodeChallengeMethodNotSupportedException
+     */
+    #[Route('/app/login_oidc', name: 'plume_user_login_oidc')]
+    #[IsGranted('PUBLIC_ACCESS')]
+    public function plumeUserLoginOidc(OidcClientInterface $plumeUserOidcClient): RedirectResponse
+    {
+        return $plumeUserOidcClient->generateAuthorizationRedirect(null, $this->getParameter('oidc_scopes'));
+    }
+
     #[Route('/admin/forbidden', name: 'administrator_access_denied')]
+    #[Route('/app/forbidden', name: 'plume_user_access_denied')]
     public function accessDenied(): Response
     {
         return $this->render('security/access_denied.html.twig');

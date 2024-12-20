@@ -2,20 +2,27 @@
 
 namespace App\Admin;
 
-use App\Entity\Administrator;
+use App\Entity\PlumeUser;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
-class AdministratorAdmin extends AbstractAdmin
+class PlumeUserAdmin extends AbstractAdmin
 {
     public function toString($object): string
     {
-        return $object instanceof Administrator
-            ? sprintf('Admin %s', $object->getEmail())
-            : 'Admin';
+        return $object instanceof PlumeUser
+            ? sprintf('User %s', $object->getEmail())
+            : 'User';
+    }
+
+    protected function configureRoutes(RouteCollectionInterface $collection): void
+    {
+        $collection
+            ->add('plume_user_admin_impersonate', $this->getRouterIdParameter().'/impersonate');
     }
 
     protected function configureListFields(ListMapper $list): void
@@ -33,21 +40,17 @@ class AdministratorAdmin extends AbstractAdmin
                 'locale' => 'fr',
                 'timezone' => 'Europe/Paris',
             ])
-            ->add('createdAt', null, [
-                'label' => 'Date d\'ajout',
-                'pattern' => 'dd/MM/yyyy',
-                'locale' => 'fr',
-                'timezone' => 'Europe/Paris',
-            ])
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'edit' => [],
                     'show' => [],
                     'delete' => [],
+                    'Prendre la place' => [
+                        'template' => 'sonata/CRUD/list__action_plume_user_impersonate.html.twig',
+                    ],
                 ],
             ])
-        ;
-        ;
+            ;
     }
 
     protected function configureFormFields(FormMapper $form): void

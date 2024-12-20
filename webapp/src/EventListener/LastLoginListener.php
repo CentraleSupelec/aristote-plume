@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Entity\Administrator;
+use App\Entity\PlumeUser;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -19,7 +20,7 @@ readonly class LastLoginListener
     {
         $user = $event->getAuthenticationToken()->getUser();
 
-        if ($user instanceof Administrator) {
+        if ($user instanceof Administrator || $user instanceof PlumeUser) {
             $user->setLastLoginAt(new DateTimeImmutable());
             $this->entityManager->persist($user);
             $this->entityManager->flush();

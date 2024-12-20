@@ -12,6 +12,7 @@
                 {% if app.user is not null %}
                     {% if app.user is instanceof('App\\Entity\\Administrator') %}
                         {% set connectedAs = 'admin' %}
+                    {% elseif app.user is instanceof('App\\Entity\\PlumeUser') %}
                     {% else %}
                         {% set connectedAs = 'unknown' %}
                     {% endif %}

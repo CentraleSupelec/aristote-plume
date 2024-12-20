@@ -9,3 +9,9 @@ administrator_login_check:
 
 administrator_logout:
   path: /admin/logout
+
+plume_user_login_check:
+  path: /app/login_check
+
+plume_user_logout:
+  path: /app/logout

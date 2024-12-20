@@ -8,3 +8,14 @@ services:
         group: Utilisateurs
         label: Administrateurs
     public: true
+
+  admin.plume_user:
+    class: App\Admin\PlumeUserAdmin
+    tags:
+      - name: sonata.admin
+        model_class: App\Entity\PlumeUser
+        controller: App\Controller\Sonata\PlumeUserController
+        manager_type: orm
+        group: Utilisateurs
+        label: Utilisateurs
+    public: true
