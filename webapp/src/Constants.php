@@ -2,45 +2,46 @@
 
 namespace App;
 
+use App\Entity\Article;
+
 final class Constants
 {
     public static function getArticleTypes(): array
     {
         return [
-            'article.type.economics' => 'economics',
-            'article.type.literature' => 'literature',
-            'article.type.science' => 'science',
+            'article.type.science' => Article::ARTICLE_TYPE_SCIENCE,
+            'article.type.economics' => Article::ARTICLE_TYPE_ECONOMICS,
+            'article.type.literature' => Article::ARTICLE_TYPE_LITERATURE,
         ];
     }
 
     public static function getAvailableArticleTypes(): array
     {
-        return ['economics', 'literature', 'science'];
+        return [Article::ARTICLE_TYPE_SCIENCE, Article::ARTICLE_TYPE_ECONOMICS, Article::ARTICLE_TYPE_LITERATURE];
     }
 
     public static function getArticleGenerationModels(): array
     {
         return [
-            'article.generation_model.aristote' => 'aristote',
+            'article.generation_model.aristote' => 'casperhansen/llama-3-70b-instruct-awq',
         ];
     }
 
     public static function getAvailableArticleGenerationModels(): array
     {
-        return ['aristote'];
+        return ['casperhansen/llama-3-70b-instruct-awq'];
     }
 
     public static function getArticleLanguages(): array
     {
         return [
-            'article.language.fr' => 'fr',
-            'article.language.en' => 'en',
-            'article.language.query' => 'query',
+            'article.language.en' => Article::ARTICLE_LANGUAGE_EN,
+            'article.language.fr' => Article::ARTICLE_LANGUAGE_FR,
         ];
     }
 
     public static function getAvailableArticleLanguages(): array
     {
-        return ['fr', 'en', 'query'];
+        return [Article::ARTICLE_LANGUAGE_EN, Article::ARTICLE_LANGUAGE_FR];
     }
 }

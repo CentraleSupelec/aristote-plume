@@ -40,11 +40,8 @@ article:
       label: Objet de la rédaction
     requested_type:
       label: Type de document
-      placeholder: -- Sélectionner un type --
     requested_language:
       label: Langue
-      placeholder: -- Sélectionner une langue --
     requested_language_model:
       label: Modèle de langue
-      placeholder: -- Sélectionner un modèle --
     submit: Lancer la rédaction

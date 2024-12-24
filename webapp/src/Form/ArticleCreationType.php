@@ -9,14 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ArticleCreationType extends AbstractType
 {
-    public function __construct(private readonly TranslatorInterface $translator)
-    {
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -26,17 +21,17 @@ class ArticleCreationType extends AbstractType
             ->add('requestedType', ChoiceType::class, [
                 'label' => 'article.form.requested_type.label',
                 'choices' => Constants::getArticleTypes(),
-                'placeholder' => $this->translator->trans('article.form.requested_type.placeholder'),
+                'disabled' => true,
             ])
             ->add('requestedLanguage', ChoiceType::class, [
                 'label' => 'article.form.requested_language.label',
                 'choices' => Constants::getArticleLanguages(),
-                'placeholder' => $this->translator->trans('article.form.requested_language.placeholder'),
+                'disabled' => true,
             ])
             ->add('requestedLanguageModel', ChoiceType::class, [
                 'label' => 'article.form.requested_language_model.label',
                 'choices' => Constants::getArticleGenerationModels(),
-                'placeholder' => $this->translator->trans('article.form.requested_language_model.placeholder'),
+                'disabled' => true,
             ])
         ;
     }
