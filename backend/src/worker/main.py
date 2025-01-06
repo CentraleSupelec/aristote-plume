@@ -13,8 +13,9 @@ settings: Settings = get_settings()
 celery_app = Celery(
     main="article_generator",
     broker=settings.redis_broker_dsn,
-    backend=settings.redis_backend_dsn
+    backend=settings.redis_backend_dsn,
 )
+
 
 @celery_app.task
 def generate_article(article_request_dict: dict) -> None:
@@ -74,5 +75,3 @@ def generate_article(article_request_dict: dict) -> None:
     runner.summary()
 
     logger.info("Article has been successfully generated.")
-
-    return

@@ -34,16 +34,13 @@ class ArxivRM(dspy.Retrieve):
         self.usage = 3
         return {"ArxivRM": usage}
 
-    def forward(
+    def forward(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
         self,
         query_or_queries: Union[str, List[str]] = None,
-        query: Optional[str] = None,
         k: Optional[int] = None,
-        by_prob: bool = True,
-        with_metadata: bool = False,
         **kwargs,
     ):
-        exclude_urls = kwargs['exclude_urls']
+        exclude_urls = kwargs["exclude_urls"]
         queries = (
             [query_or_queries]
             if isinstance(query_or_queries, str)
@@ -62,7 +59,7 @@ class ArxivRM(dspy.Retrieve):
                     search = arxiv.Search(
                         query=query,
                         max_results=self.k,
-                        sort_by=arxiv.SortCriterion.Relevance
+                        sort_by=arxiv.SortCriterion.Relevance,
                     )
                     time.sleep(3)  # Pour éviter de trop interroger l'API d'un coup
 
@@ -74,17 +71,16 @@ class ArxivRM(dspy.Retrieve):
                             "title": result.title,
                             "description": result.summary,
                         }
-            except Exception as e:
-                logging.error(f"Error occurs when searching query {query}: {e}")
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                logging.error("Error occurs when searching query %s: %s", query, e)
 
         valid_url_to_snippets = self.webpage_helper.urls_to_snippets(
             list(url_to_results.keys())
         )
 
         collected_results = []
-        for url in valid_url_to_snippets:
-            r = url_to_results[url]
-            r["snippets"] = valid_url_to_snippets[url]["snippets"]
-            collected_results.append(r)
+        for url, data in valid_url_to_snippets.items():
+            data["snippets"] = valid_url_to_snippets[url]["snippets"]
+            collected_results.append(data)
 
         return collected_results

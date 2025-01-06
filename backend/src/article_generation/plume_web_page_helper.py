@@ -6,6 +6,7 @@ import requests
 from knowledge_storm import WebPageHelper
 from trafilatura import extract
 
+
 class PlumeWebPageHelper(WebPageHelper):
     """Helper class to process web pages.
 
@@ -38,7 +39,7 @@ class PlumeWebPageHelper(WebPageHelper):
 
     def _extract_pdf_text_from_url(self, pdf_url: str) -> str:
         try:
-            response = requests.get(pdf_url)
+            response = requests.get(pdf_url, timeout=60)
             response.raise_for_status()
 
             with fitz.open(stream=response.content, filetype="pdf") as doc:
@@ -50,22 +51,26 @@ class PlumeWebPageHelper(WebPageHelper):
 
         except requests.exceptions.RequestException as e:
             print(f"Erreur lors du téléchargement : {e}")
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Erreur lors de l'extraction du texte : {e}")
+
+        return ""
 
     def url_to_article(self, u: str) -> str:
         if "arxiv.org/pdf" in u:
             article_text = self._extract_pdf_text_from_url(u)
-            return article_text
-        else:
-            # Télécharger la page HTML
-            h = self.download_webpage(u)
-            if h is not None :
-                article_text = extract(
-                    h,
-                    include_tables=False,
-                    include_comments=False,
-                    output_format="txt",
-                )
-                return article_text
 
+            return article_text
+
+        h = self.download_webpage(u)
+        if h is not None:
+            article_text = extract(
+                h,
+                include_tables=False,
+                include_comments=False,
+                output_format="txt",
+            )
+
+            return article_text
+
+        return ""

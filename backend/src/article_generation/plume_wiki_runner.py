@@ -3,9 +3,18 @@ import logging
 import os
 from typing import List
 
-from knowledge_storm import STORMWikiRunner, STORMWikiRunnerArguments, STORMWikiLMConfigs, FileIOHelper, makeStringRed
+from knowledge_storm import (
+    STORMWikiRunner,
+    STORMWikiRunnerArguments,
+    STORMWikiLMConfigs,
+    FileIOHelper,
+    makeStringRed,
+)
 from knowledge_storm.storm_wiki.modules.callback import BaseCallbackHandler
-from knowledge_storm.storm_wiki.modules.storm_dataclass import StormInformationTable, StormArticle
+from knowledge_storm.storm_wiki.modules.storm_dataclass import (
+    StormInformationTable,
+    StormArticle,
+)
 
 from config.settings import get_settings, Settings
 from src.article_generation.s3_storage_service import S3StorageService
@@ -13,13 +22,18 @@ from src.article_generation.s3_storage_service import S3StorageService
 logger = logging.getLogger(__name__)
 settings: Settings = get_settings()
 
+
 class PlumeWikiRunner(STORMWikiRunner):
     def __init__(
         self, args: STORMWikiRunnerArguments, lm_configs: STORMWikiLMConfigs, rm
     ):
         super().__init__(args=args, lm_configs=lm_configs, rm=rm)
 
-    def run(
+        self.topic = ""
+        self.article_dir_name = ""
+        self.article_output_dir = ""
+
+    def run(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         topic: str,
         ground_truth_url: str = "",
@@ -29,7 +43,7 @@ class PlumeWikiRunner(STORMWikiRunner):
         do_polish_article: bool = True,
         remove_duplicate: bool = False,
         callback_handler: BaseCallbackHandler = BaseCallbackHandler(),
-        celery_task_id: str = '',
+        celery_task_id: str = "",
     ):
         """
         Run the STORM pipeline.
@@ -60,7 +74,9 @@ class PlumeWikiRunner(STORMWikiRunner):
 
         self.topic = topic
         self.article_dir_name = celery_task_id
-        self.article_output_dir = os.path.join(self.args.output_dir, self.article_dir_name)
+        self.article_output_dir = os.path.join(
+            self.args.output_dir, self.article_dir_name
+        )
         os.makedirs(self.article_output_dir, exist_ok=True)
 
         # research module
@@ -134,7 +150,9 @@ class PlumeWikiRunner(STORMWikiRunner):
 
         llm_call_history: List[dict] = self.lm_configs.collect_and_reset_lm_history()
         with open(
-            os.path.join(self.article_output_dir, "llm_call_history.jsonl"), "w"
+            os.path.join(self.article_output_dir, "llm_call_history.jsonl"),
+            "w",
+            encoding="utf-8",
         ) as f:
             for call in llm_call_history:
                 if "kwargs" in call:
@@ -143,11 +161,11 @@ class PlumeWikiRunner(STORMWikiRunner):
                     )  # All kwargs are dumped together to run_config.json.
                 for key, value in call.items():
                     if not isinstance(value, dict):
-                        if hasattr(value, 'to_dict'):
-                            call[key]=value.to_dict()
-                        elif hasattr(value, 'model_dump'):
+                        if hasattr(value, "to_dict"):
+                            call[key] = value.to_dict()
+                        elif hasattr(value, "model_dump"):
                             call[key] = value.model_dump()
-                        elif hasattr(value, 'dict'):
+                        elif hasattr(value, "dict"):
                             call[key] = value.dict()
                 f.write(json.dumps(call) + "\n")
 
@@ -158,10 +176,18 @@ class PlumeWikiRunner(STORMWikiRunner):
             s3_storage_bucket_name=settings.s3_storage_bucket_name,
             s3_storage_upload_directory=settings.s3_storage_upload_directory,
         )
-        upload_error = s3_storage_service.upload_directory_to_s3(self.article_output_dir, self.article_dir_name)
+        upload_error = s3_storage_service.upload_directory_to_s3(
+            self.article_output_dir, self.article_dir_name
+        )
 
         if not upload_error:
             try:
-                S3StorageService.delete_local_directory_recursively(self.article_output_dir)
-            except Exception as e:
-                logger.error(f"Failed to delete cache directory {self.article_output_dir}: {e}")
+                S3StorageService.delete_local_directory_recursively(
+                    self.article_output_dir
+                )
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                logger.error(
+                    "Failed to delete cache directory %s: %s",
+                    self.article_output_dir,
+                    e,
+                )

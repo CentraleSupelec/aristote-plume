@@ -5,8 +5,9 @@ import boto3
 
 logger = logging.getLogger(__name__)
 
+
 class S3StorageService:
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         s3_storage_access_key: str,
         s3_storage_secret_key: str,
@@ -18,7 +19,7 @@ class S3StorageService:
             "s3",
             aws_access_key_id=s3_storage_access_key,
             aws_secret_access_key=s3_storage_secret_key,
-            endpoint_url=s3_storage_endpoint_url
+            endpoint_url=s3_storage_endpoint_url,
         )
         self.s3_storage_bucket_name = s3_storage_bucket_name
         self.s3_storage_upload_directory = s3_storage_upload_directory
@@ -34,16 +35,25 @@ class S3StorageService:
         s3_prefix = os.path.join(self.s3_storage_upload_directory, prefix)
         upload_error = False
 
-        for dirpath, dirnames, filenames in os.walk(abs_directory_path):
+        for dirpath, dirnames, filenames in os.walk(  # pylint: disable=unused-variable
+            abs_directory_path
+        ):
             for filename in filenames:
                 local_path = os.path.join(dirpath, filename)
                 relative_path = os.path.relpath(local_path, abs_directory_path)
                 s3_key = os.path.join(s3_prefix, relative_path).replace("\\", "/")
                 try:
-                    logger.info(f"Uploading {local_path} to s3://{self.s3_storage_bucket_name}/{s3_key}...")
-                    self.s3_storage_client.upload_file(local_path, self.s3_storage_bucket_name, s3_key)
-                except Exception as e:
-                    logger.error(f"Failed to upload {local_path}: {e}")
+                    logger.info(
+                        "Uploading %s to s3://%s/%s...",
+                        local_path,
+                        self.s3_storage_bucket_name,
+                        s3_key,
+                    )
+                    self.s3_storage_client.upload_file(
+                        local_path, self.s3_storage_bucket_name, s3_key
+                    )
+                except Exception as e:  # pylint: disable=broad-exception-caught
+                    logger.error("Failed to upload %s: %s", local_path, e)
                     upload_error = True
 
         return upload_error
