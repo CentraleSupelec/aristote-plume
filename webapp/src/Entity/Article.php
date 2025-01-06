@@ -7,6 +7,7 @@ use App\Repository\ArticleRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -19,6 +20,8 @@ class Article
     final public const ARTICLE_TYPE_LITERATURE = 'literature';
     final public const ARTICLE_LANGUAGE_FR = 'fr';
     final public const ARTICLE_LANGUAGE_EN = 'en';
+
+    final public const CREATION_REQUEST_GROUP = 'CREATION_REQUEST';
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -35,6 +38,7 @@ class Article
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
+    #[Groups([self::CREATION_REQUEST_GROUP])]
     private ?string $requestedTopic = null;
 
     #[ORM\Column(length: 255)]
@@ -45,11 +49,13 @@ class Article
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
     #[Assert\Choice(callback: [Constants::class, 'getAvailableArticleGenerationModels'])]
+    #[Groups([self::CREATION_REQUEST_GROUP])]
     private ?string $requestedLanguageModel = 'casperhansen/llama-3-70b-instruct-awq';
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
     #[Assert\Choice(callback: [Constants::class, 'getAvailableArticleLanguages'])]
+    #[Groups([self::CREATION_REQUEST_GROUP])]
     private string $requestedLanguage = self::ARTICLE_LANGUAGE_EN;
 
     public function getId(): ?Uuid

@@ -17,6 +17,11 @@ framework:
   php_errors:
     log: true
 
+  http_client:
+    scoped_clients:
+      fast_api.client:
+        base_uri: '%env(FASTAPI_URL)%'
+
 when@test:
   framework:
     test: true

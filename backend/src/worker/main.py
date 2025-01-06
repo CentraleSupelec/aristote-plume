@@ -19,26 +19,26 @@ celery_app = Celery(
 @celery_app.task
 def generate_article(article_request_dict: dict) -> None:
     article_request = ArticleRequest.model_validate(article_request_dict)
-    logger.info(f"Generating article on topic: {article_request.topic}...")
+    logger.info(f"Generating article on topic: {article_request.requested_topic}...")
 
     lm_configs = STORMWikiLMConfigs()
 
     llama3_500 = VLLMClient(
-        model=article_request.language_model,
+        model=article_request.requested_language_model,
         url=settings.aristote_dispatcher_uri,
         port=settings.aristote_dispatcher_port,
         api_key=settings.aristote_dispatcher_api_key,
         max_tokens=500,
     )
     llama3_700 = VLLMClient(
-        model=article_request.language_model,
+        model=article_request.requested_language_model,
         url=settings.aristote_dispatcher_uri,
         port=settings.aristote_dispatcher_port,
         api_key=settings.aristote_dispatcher_api_key,
         max_tokens=700,
     )
     llama3_4000 = VLLMClient(
-        model=article_request.language_model,
+        model=article_request.requested_language_model,
         url=settings.aristote_dispatcher_uri,
         port=settings.aristote_dispatcher_port,
         api_key=settings.aristote_dispatcher_api_key,
@@ -63,7 +63,7 @@ def generate_article(article_request_dict: dict) -> None:
     rm = ArxivRM(k=engine_args.search_top_k)
     runner = PlumeWikiRunner(engine_args, lm_configs, rm)
     runner.run(
-        topic=article_request.topic,
+        topic=article_request.requested_topic,
         do_research=True,
         do_generate_outline=True,
         do_generate_article=True,

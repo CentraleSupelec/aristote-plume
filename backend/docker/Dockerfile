@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bookworm as python_base
+FROM python:3.12-slim-bookworm AS python_base
 
 WORKDIR /backend
 COPY ./requirements.txt requirements.txt
@@ -13,10 +13,10 @@ COPY docker/backend-entrypoint.sh /backend-entrypoint.sh
 
 ENTRYPOINT ["/bin/bash", "/backend-entrypoint.sh"]
 
-FROM python_base as python_api
+FROM python_base AS python_api
 
 CMD ["fastapi", "run", "/backend/src/api/main.py"]
 
-FROM python_base as python_worker
+FROM python_base AS python_worker
 
 CMD ["celery", "--app", "src.worker.main", "worker", "--loglevel=INFO", "--pool=threads"]
