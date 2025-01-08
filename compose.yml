@@ -65,6 +65,7 @@ services:
       - "./backend/src:/backend/src:cached"
       - "./backend/config:/backend/config:cached"
       - "./backend/.env:/backend/.env:cached"
+      - "./backend/pyproject.toml:/backend/pyproject.toml:cached"
 
   python_worker:
     build:
@@ -79,6 +80,7 @@ services:
       - "./backend/src:/backend/src:cached"
       - "./backend/config:/backend/config:cached"
       - "./backend/.env:/backend/.env:cached"
+      - "./backend/pyproject.toml:/backend/pyproject.toml:cached"
       - "./backend/results_cache:/backend/results_cache:delegated"
 
   postgres:

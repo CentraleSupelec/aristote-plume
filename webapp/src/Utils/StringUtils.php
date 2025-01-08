@@ -2,7 +2,6 @@
 
 namespace App\Utils;
 
-use Normalizer;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -16,6 +15,6 @@ class StringUtils
             $formattedErrorMessage[] = sprintf('%s : %s', $violation->getPropertyPath(), $violation->getMessage());
         }
 
-        return join("\n", $formattedErrorMessage);
+        return implode("\n", $formattedErrorMessage);
     }
 }

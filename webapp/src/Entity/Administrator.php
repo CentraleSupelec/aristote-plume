@@ -41,7 +41,7 @@ class Administrator implements UserInterface, Stringable
 
     public function __toString(): string
     {
-        return $this->getEmail();
+        return (string) $this->getEmail();
     }
 
     public function getId(): ?Uuid

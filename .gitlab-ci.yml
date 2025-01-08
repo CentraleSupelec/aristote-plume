@@ -1,0 +1,60 @@
+cache:
+  key:
+    files:
+      - webapp/composer.lock
+      - backend/requirements.txt
+    prefix: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - webapp/node_modules/
+    - webapp/vendor/
+    - backend/.venv/
+    - backend/__pycache__/
+    - ~/.cache/pip/
+
+stages:
+  - tests
+
+.php_test_template: &php_test_template
+  stage: tests
+  image: illuin/symfony-ready:8.2-node-20
+  tags:
+    - docker
+  before_script:
+    - echo "memory_limit = -1" > /usr/local/etc/php/conf.d/memory.ini
+    - cd webapp
+    - php /usr/bin/composer install -n
+  except:
+    - tags
+
+.python_test_template: &python_test_template
+  stage: tests
+  image: python:3.12-slim-bookworm
+  tags:
+    - docker
+  before_script:
+    - cd backend
+    - if [ ! -d ".venv" ]; then python3 -m venv .venv; fi
+    - source .venv/bin/activate
+    - pip install -r requirements.txt --no-cache-dir
+  except:
+    - tags
+
+php_cs_fixer:
+  <<: *php_test_template
+  script:
+    - php vendor/bin/php-cs-fixer fix -v --dry-run
+
+rector:
+  <<: *php_test_template
+  script:
+    - php vendor/bin/rector process --dry-run
+
+pylint:
+  <<: *python_test_template
+  script:
+    - pylint src
+
+black:
+  <<: *python_test_template
+  script:
+    - black src --check
