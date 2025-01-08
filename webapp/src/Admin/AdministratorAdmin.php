@@ -47,7 +47,6 @@ class AdministratorAdmin extends AbstractAdmin
                 ],
             ])
         ;
-        ;
     }
 
     protected function configureFormFields(FormMapper $form): void

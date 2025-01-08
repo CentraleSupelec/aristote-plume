@@ -52,7 +52,7 @@ class ArticleController extends AbstractController
                     $response->getContent(), ArticleCreationTaskDto::class, 'json'
                 );
                 $errors = $validator->validate($articleCreationTaskDto);
-                if (count($errors)) {
+                if (count($errors) > 0) {
                     // TODO: handle errors
                 }
 
@@ -64,7 +64,7 @@ class ArticleController extends AbstractController
                 return $this->redirectToRoute(
                     'article_waiting_page', ['generationTaskId' => $article->getGenerationTaskId()]
                 );
-            } catch (TransportExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface $e) {
+            } catch (TransportExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface) {
                 // TODO: handle errors
             }
         }

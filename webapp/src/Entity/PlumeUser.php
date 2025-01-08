@@ -53,7 +53,7 @@ class PlumeUser implements UserInterface, Stringable
 
     public function __toString(): string
     {
-        return $this->getEmail();
+        return (string) $this->getEmail();
     }
 
     public function getId(): ?Uuid
@@ -131,11 +131,9 @@ class PlumeUser implements UserInterface, Stringable
 
     public function removeArticle(Article $article): static
     {
-        if ($this->articles->removeElement($article)) {
-            // set the owning side to null (unless already changed)
-            if ($article->getAuthor() === $this) {
-                $article->setAuthor(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->articles->removeElement($article) && $article->getAuthor() === $this) {
+            $article->setAuthor(null);
         }
 
         return $this;

@@ -34,10 +34,13 @@ class ArxivRM(dspy.Retrieve):
         self.usage = 3
         return {"ArxivRM": usage}
 
-    def forward(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
+    def forward(  # pylint: disable=too-many-locals,too-many-arguments,too-many-positional-arguments
         self,
         query_or_queries: Union[str, List[str]] = None,
+        query: Optional[str] = None,
         k: Optional[int] = None,
+        by_prob: bool = True,
+        with_metadata: bool = False,
         **kwargs,
     ):
         exclude_urls = kwargs["exclude_urls"]
@@ -51,13 +54,13 @@ class ArxivRM(dspy.Retrieve):
         url_to_results = {}
         client = arxiv.Client()
 
-        for query in queries:
+        for _query in queries:
             try:
                 # Acquérir le verrou juste avant l'appel à l'API
                 with self.lock:
                     # Requête arXiv avec le mot-clé de la query
                     search = arxiv.Search(
-                        query=query,
+                        query=_query,
                         max_results=self.k,
                         sort_by=arxiv.SortCriterion.Relevance,
                     )
@@ -72,7 +75,7 @@ class ArxivRM(dspy.Retrieve):
                             "description": result.summary,
                         }
             except Exception as e:  # pylint: disable=broad-exception-caught
-                logging.error("Error occurs when searching query %s: %s", query, e)
+                logging.error("Error occurs when searching query %s: %s", _query, e)
 
         valid_url_to_snippets = self.webpage_helper.urls_to_snippets(
             list(url_to_results.keys())

@@ -42,7 +42,7 @@ class CreateAdministratorCommand extends Command
         $administrator = (new Administrator())->setEmail($email)->setEnabled(true);
 
         $errors = $this->validator->validate($administrator);
-        if (count($errors)) {
+        if (count($errors) > 0) {
             $io->error(sprintf('Impossible to create admin: %s', StringUtils::formatValidationErrors($errors)));
 
             return self::FAILURE;
