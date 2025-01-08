@@ -34,14 +34,8 @@ class ArxivRM(dspy.Retrieve):
         self.usage = 3
         return {"ArxivRM": usage}
 
-    def forward(  # pylint: disable=too-many-locals,too-many-arguments,too-many-positional-arguments
-        self,
-        query_or_queries: Union[str, List[str]] = None,
-        query: Optional[str] = None,
-        k: Optional[int] = None,
-        by_prob: bool = True,
-        with_metadata: bool = False,
-        **kwargs,
+    def forward(  # pylint: disable=too-many-locals
+        self, query_or_queries: Union[str, List[str]], k: Optional[int] = None, **kwargs
     ):
         exclude_urls = kwargs["exclude_urls"]
         queries = (
@@ -83,7 +77,8 @@ class ArxivRM(dspy.Retrieve):
 
         collected_results = []
         for url, data in valid_url_to_snippets.items():
-            data["snippets"] = valid_url_to_snippets[url]["snippets"]
-            collected_results.append(data)
+            valid_result = url_to_results[url]
+            valid_result["snippets"] = data["snippets"]
+            collected_results.append(valid_result)
 
         return collected_results

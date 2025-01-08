@@ -1,8 +1,9 @@
 import json
 import logging
 import os
-from typing import List
+from typing import List, Union
 
+from celery import Task
 from knowledge_storm import (
     STORMWikiRunner,
     STORMWikiRunnerArguments,
@@ -43,7 +44,7 @@ class PlumeWikiRunner(STORMWikiRunner):
         do_polish_article: bool = True,
         remove_duplicate: bool = False,
         callback_handler: BaseCallbackHandler = BaseCallbackHandler(),
-        celery_task_id: str = "",
+        celery_task: Union[Task, None] = None,
     ):
         """
         Run the STORM pipeline.
@@ -61,7 +62,7 @@ class PlumeWikiRunner(STORMWikiRunner):
              duplicated content.
             remove_duplicate: If True, remove duplicated content.
             callback_handler: A callback handler to handle the intermediate results.
-            celery_task_id: The uuid of the celery task carrying the article generation
+            celery_task: The celery task carrying the article generation
         """
         assert (
             do_research
@@ -72,8 +73,11 @@ class PlumeWikiRunner(STORMWikiRunner):
             "No action is specified. Please set at least one of --do-research, --do-generate-outline, --do-generate-article, --do-polish-article"
         )
 
+        if celery_task is None:
+            raise "No celery task passed to the function, impossible to generate article."
+
         self.topic = topic
-        self.article_dir_name = celery_task_id
+        self.article_dir_name = celery_task.request.id
         self.article_output_dir = os.path.join(
             self.args.output_dir, self.article_dir_name
         )
@@ -82,12 +86,18 @@ class PlumeWikiRunner(STORMWikiRunner):
         # research module
         information_table: StormInformationTable = None
         if do_research:
+            celery_task.update_state(
+                state="PROGRESS", meta={"stage": "Knowledge curation"}
+            )
             information_table = self.run_knowledge_curation_module(
                 ground_truth_url=ground_truth_url, callback_handler=callback_handler
             )
         # outline generation module
         outline: StormArticle = None
         if do_generate_outline:
+            celery_task.update_state(
+                state="PROGRESS", meta={"stage": "Generate outline"}
+            )
             # load information table if it's not initialized
             if information_table is None:
                 information_table = self._load_information_table_from_local_fs(
@@ -100,6 +110,9 @@ class PlumeWikiRunner(STORMWikiRunner):
         # article generation module
         draft_article: StormArticle = None
         if do_generate_article:
+            celery_task.update_state(
+                state="PROGRESS", meta={"stage": "Generate article"}
+            )
             if information_table is None:
                 information_table = self._load_information_table_from_local_fs(
                     os.path.join(self.article_output_dir, "conversation_log.json")
@@ -119,6 +132,7 @@ class PlumeWikiRunner(STORMWikiRunner):
 
         # article polishing module
         if do_polish_article:
+            celery_task.update_state(state="PROGRESS", meta={"stage": "Polish article"})
             if draft_article is None:
                 draft_article_path = os.path.join(
                     self.article_output_dir, "storm_gen_article.txt"

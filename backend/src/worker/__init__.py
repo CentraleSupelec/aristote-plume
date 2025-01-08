@@ -1,1 +1,1 @@
-from .main import generate_article
+from .main import celery_app, generate_article

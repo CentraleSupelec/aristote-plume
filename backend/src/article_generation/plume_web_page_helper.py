@@ -1,5 +1,5 @@
 import concurrent.futures
-from typing import List, Dict
+from typing import List, Dict, Union
 
 import fitz
 import requests
@@ -56,7 +56,7 @@ class PlumeWebPageHelper(WebPageHelper):
 
         return ""
 
-    def url_to_article(self, u: str) -> str:
+    def url_to_article(self, u: str) -> Union[str, None]:
         if "arxiv.org/pdf" in u:
             article_text = self._extract_pdf_text_from_url(u)
 
@@ -73,4 +73,4 @@ class PlumeWebPageHelper(WebPageHelper):
 
             return article_text
 
-        return ""
+        return None

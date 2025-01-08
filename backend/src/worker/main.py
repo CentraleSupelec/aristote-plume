@@ -16,11 +16,17 @@ celery_app = Celery(
     backend=settings.redis_backend_dsn,
 )
 
+celery_app.conf.update(
+    task_track_started=True,
+    result_extended=True,
+)
+
 
 @celery_app.task
 def generate_article(article_request_dict: dict) -> None:
     article_request = ArticleRequest.model_validate(article_request_dict)
     logger.info(f"Generating article on topic: {article_request.requested_topic}...")
+    current_task.update_state(state="PROGRESS", meta={"stage": "Initialization"})
 
     lm_configs = STORMWikiLMConfigs()
 
@@ -69,8 +75,9 @@ def generate_article(article_request_dict: dict) -> None:
         do_generate_outline=True,
         do_generate_article=True,
         do_polish_article=True,
-        celery_task_id=current_task.request.id,
+        celery_task=current_task,
     )
+    current_task.update_state(state="PROGRESS", meta={"stage": "Post run"})
     runner.post_run()
     runner.summary()
 
