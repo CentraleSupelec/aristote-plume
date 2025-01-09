@@ -1,8 +1,17 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from celery import Celery, current_task
 from celery.utils.log import get_task_logger
 from knowledge_storm import STORMWikiLMConfigs, VLLMClient, STORMWikiRunnerArguments
 
 from config.settings import get_settings, Settings
+from src.model.article_progress_stage import (
+    ArticleProgressStage,
+    TOTAL_PROGRESS_STAGES,
+    get_stage_index,
+)
+from src.model.article_generation_task_status import ArticleGenerationTaskStatus
 from src.model.article_request import ArticleRequest
 from src.article_generation.arxiv_rm import ArxivRM
 from src.article_generation.plume_wiki_runner import PlumeWikiRunner
@@ -26,7 +35,17 @@ celery_app.conf.update(
 def generate_article(article_request_dict: dict) -> None:
     article_request = ArticleRequest.model_validate(article_request_dict)
     logger.info(f"Generating article on topic: {article_request.requested_topic}...")
-    current_task.update_state(state="PROGRESS", meta={"stage": "Initialization"})
+    current_task.update_state(
+        state=ArticleGenerationTaskStatus.PROGRESS.value,
+        meta={
+            "stage": ArticleProgressStage.INITIALIZATION.value,
+            "total_stages": TOTAL_PROGRESS_STAGES,
+            "stage_number": get_stage_index(ArticleProgressStage.INITIALIZATION),
+            "stage_start_date": datetime.now(ZoneInfo("Europe/Paris")).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),
+        },
+    )
 
     lm_configs = STORMWikiLMConfigs()
 
@@ -77,7 +96,17 @@ def generate_article(article_request_dict: dict) -> None:
         do_polish_article=True,
         celery_task=current_task,
     )
-    current_task.update_state(state="PROGRESS", meta={"stage": "Post run"})
+    current_task.update_state(
+        state=ArticleGenerationTaskStatus.PROGRESS.value,
+        meta={
+            "stage": ArticleProgressStage.POST_RUN.value,
+            "total_stages": TOTAL_PROGRESS_STAGES,
+            "stage_number": get_stage_index(ArticleProgressStage.POST_RUN),
+            "stage_start_date": datetime.now(ZoneInfo("Europe/Paris")).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),
+        },
+    )
     runner.post_run()
     runner.summary()
 

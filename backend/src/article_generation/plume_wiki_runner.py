@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from typing import List, Union
 
 from celery import Task
@@ -18,6 +20,12 @@ from knowledge_storm.storm_wiki.modules.storm_dataclass import (
 )
 
 from config.settings import get_settings, Settings
+from src.model.article_progress_stage import (
+    ArticleProgressStage,
+    TOTAL_PROGRESS_STAGES,
+    get_stage_index,
+)
+from src.model.article_generation_task_status import ArticleGenerationTaskStatus
 from src.article_generation.s3_storage_service import S3StorageService
 
 logger = logging.getLogger(__name__)
@@ -74,7 +82,9 @@ class PlumeWikiRunner(STORMWikiRunner):
         )
 
         if celery_task is None:
-            raise "No celery task passed to the function, impossible to generate article."
+            raise ValueError(
+                "No celery task passed to the function, impossible to generate article."
+            )
 
         self.topic = topic
         self.article_dir_name = celery_task.request.id
@@ -87,7 +97,17 @@ class PlumeWikiRunner(STORMWikiRunner):
         information_table: StormInformationTable = None
         if do_research:
             celery_task.update_state(
-                state="PROGRESS", meta={"stage": "Knowledge curation"}
+                state=ArticleGenerationTaskStatus.PROGRESS.value,
+                meta={
+                    "stage": ArticleProgressStage.KNOWLEDGE_CURATION.value,
+                    "total_stages": TOTAL_PROGRESS_STAGES,
+                    "stage_number": get_stage_index(
+                        ArticleProgressStage.KNOWLEDGE_CURATION
+                    ),
+                    "stage_start_date": datetime.now(ZoneInfo("Europe/Paris")).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                },
             )
             information_table = self.run_knowledge_curation_module(
                 ground_truth_url=ground_truth_url, callback_handler=callback_handler
@@ -96,7 +116,17 @@ class PlumeWikiRunner(STORMWikiRunner):
         outline: StormArticle = None
         if do_generate_outline:
             celery_task.update_state(
-                state="PROGRESS", meta={"stage": "Generate outline"}
+                state=ArticleGenerationTaskStatus.PROGRESS.value,
+                meta={
+                    "stage": ArticleProgressStage.OUTLINE_GENERATION.value,
+                    "total_stages": TOTAL_PROGRESS_STAGES,
+                    "stage_number": get_stage_index(
+                        ArticleProgressStage.OUTLINE_GENERATION
+                    ),
+                    "stage_start_date": datetime.now(ZoneInfo("Europe/Paris")).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                },
             )
             # load information table if it's not initialized
             if information_table is None:
@@ -111,7 +141,17 @@ class PlumeWikiRunner(STORMWikiRunner):
         draft_article: StormArticle = None
         if do_generate_article:
             celery_task.update_state(
-                state="PROGRESS", meta={"stage": "Generate article"}
+                state=ArticleGenerationTaskStatus.PROGRESS.value,
+                meta={
+                    "stage": ArticleProgressStage.ARTICLE_GENERATION.value,
+                    "total_stages": TOTAL_PROGRESS_STAGES,
+                    "stage_number": get_stage_index(
+                        ArticleProgressStage.ARTICLE_GENERATION
+                    ),
+                    "stage_start_date": datetime.now(ZoneInfo("Europe/Paris")).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                },
             )
             if information_table is None:
                 information_table = self._load_information_table_from_local_fs(
@@ -132,7 +172,19 @@ class PlumeWikiRunner(STORMWikiRunner):
 
         # article polishing module
         if do_polish_article:
-            celery_task.update_state(state="PROGRESS", meta={"stage": "Polish article"})
+            celery_task.update_state(
+                state=ArticleGenerationTaskStatus.PROGRESS.value,
+                meta={
+                    "stage": ArticleProgressStage.ARTICLE_POLISH.value,
+                    "total_stages": TOTAL_PROGRESS_STAGES,
+                    "stage_number": get_stage_index(
+                        ArticleProgressStage.ARTICLE_POLISH
+                    ),
+                    "stage_start_date": datetime.now(ZoneInfo("Europe/Paris")).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                },
+            )
             if draft_article is None:
                 draft_article_path = os.path.join(
                     self.article_output_dir, "storm_gen_article.txt"
