@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\AdministratorRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Stringable;
@@ -33,10 +34,10 @@ class Administrator implements UserInterface, Stringable
     #[Assert\NotBlank(allowNull: false)]
     private ?string $email = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $lastLoginAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::BOOLEAN)]
     private ?bool $enabled = null;
 
     public function __toString(): string

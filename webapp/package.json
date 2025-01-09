@@ -14,6 +14,7 @@
         "file-loader": "^6.2.0",
         "fos-router": "file:vendor/friendsofsymfony/jsrouting-bundle/Resources",
         "react": "^18.0",
+        "react-bootstrap": "^2.10.7",
         "react-dom": "^18.0",
         "regenerator-runtime": "^0.13.9",
         "sass": "^1.83.0",

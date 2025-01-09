@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="h3 text-center mt-5 mb-3">{{ 'app_article_waiting_page.title' | trans }}</h1>
+                <div {{ react_component('WaitForArticleGeneration', {serializedArticle: article|serialize('json', {groups: constant('App\\Entity\\Article::WAIT_FOR_GENERATION_GROUP')})}) }}></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

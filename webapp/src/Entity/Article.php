@@ -4,7 +4,11 @@ namespace App\Entity;
 
 use App\Constants;
 use App\Repository\ArticleRepository;
+use DateTimeImmutable;
+use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -22,11 +26,15 @@ class Article
     final public const ARTICLE_LANGUAGE_EN = 'en';
 
     final public const CREATION_REQUEST_GROUP = 'CREATION_REQUEST';
+    final public const WAIT_FOR_GENERATION_GROUP = 'WAIT_FOR_GENERATION';
+
+    use TimestampableEntity;
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups([self::WAIT_FOR_GENERATION_GROUP])]
     private ?Uuid $id = null;
 
     #[ORM\Column(type: UuidType::NAME, unique: true, nullable: true)]
@@ -38,25 +46,29 @@ class Article
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
-    #[Groups([self::CREATION_REQUEST_GROUP])]
+    #[Groups([self::CREATION_REQUEST_GROUP, self::WAIT_FOR_GENERATION_GROUP])]
     private ?string $requestedTopic = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
     #[Assert\Choice(callback: [Constants::class, 'getAvailableArticleTypes'])]
+    #[Groups([self::WAIT_FOR_GENERATION_GROUP])]
     private string $requestedType = self::ARTICLE_TYPE_SCIENCE;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
     #[Assert\Choice(callback: [Constants::class, 'getAvailableArticleGenerationModels'])]
-    #[Groups([self::CREATION_REQUEST_GROUP])]
+    #[Groups([self::CREATION_REQUEST_GROUP, self::WAIT_FOR_GENERATION_GROUP])]
     private ?string $requestedLanguageModel = 'casperhansen/llama-3-70b-instruct-awq';
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
     #[Assert\Choice(callback: [Constants::class, 'getAvailableArticleLanguages'])]
-    #[Groups([self::CREATION_REQUEST_GROUP])]
+    #[Groups([self::CREATION_REQUEST_GROUP, self::WAIT_FOR_GENERATION_GROUP])]
     private string $requestedLanguage = self::ARTICLE_LANGUAGE_EN;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $articleGeneratedAt = null;
 
     public function getId(): ?Uuid
     {
@@ -131,6 +143,18 @@ class Article
     public function setRequestedLanguage(string $requestedLanguage): static
     {
         $this->requestedLanguage = $requestedLanguage;
+
+        return $this;
+    }
+
+    public function getArticleGeneratedAt(): ?DateTimeInterface
+    {
+        return $this->articleGeneratedAt;
+    }
+
+    public function setArticleGeneratedAt(?DateTimeImmutable $articleGeneratedAt): static
+    {
+        $this->articleGeneratedAt = $articleGeneratedAt;
 
         return $this;
     }

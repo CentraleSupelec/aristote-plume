@@ -8,6 +8,7 @@ use App\Form\ArticleCreationType;
 use App\Model\ArticleCreationTaskDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,12 +29,13 @@ class ArticleController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(
         #[CurrentUser] PlumeUser $user,
-        Request $request,
-        EntityManagerInterface $entityManager,
-        HttpClientInterface $fastApiClient,
-        SerializerInterface $serializer,
-        ValidatorInterface $validator,
-    ): Response {
+        Request                  $request,
+        EntityManagerInterface   $entityManager,
+        HttpClientInterface      $fastApiClient,
+        SerializerInterface      $serializer,
+        ValidatorInterface       $validator,
+    ): Response
+    {
         $article = (new Article())->setAuthor($user);
         $form = $this->createForm(ArticleCreationType::class, $article);
 
@@ -62,7 +64,7 @@ class ArticleController extends AbstractController
                 $entityManager->flush();
 
                 return $this->redirectToRoute(
-                    'article_waiting_page', ['generationTaskId' => $article->getGenerationTaskId()]
+                    'article_waiting_page', ['id' => $article->getId()]
                 );
             } catch (TransportExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface) {
                 // TODO: handle errors
@@ -72,8 +74,29 @@ class ArticleController extends AbstractController
         return $this->render('app_home.html.twig', ['form' => $form]);
     }
 
-    #[Route('/{generationTaskId}', name: 'article_waiting_page')]
-    public function waitForArticleGeneration(): Response
+    #[Route('/{id}/wait-for-generation', name: 'article_waiting_page')]
+    public function waitForArticleGeneration(Article $article): Response
+    {
+        return $this->render('article_waiting_page.html.twig', ['article' => $article]);
+    }
+
+    #[Route('/{id}/check-for-status', name: 'article_check_status', options: ['expose' => true])]
+    public function checkArticleStatus(Article $article): JsonResponse
+    {
+        return $this->json([
+            "task_id" => "a7ec25ee-dba2-48f8-ae9c-d6c572bd368b",
+            "task_status" => "PROGRESS",
+            "stage_info" => [
+                "stage" => "article.progress.knowledge_curation",
+                "total_stages" => 5,
+                "stage_number" => 1,
+                "stage_start_date" => "2025-01-09 15:02:52"
+            ]
+        ]);
+    }
+
+    #[Route('/{id}', name: 'article_detail_page')]
+    public function viewArticle(): Response
     {
         return new Response('ok');
     }

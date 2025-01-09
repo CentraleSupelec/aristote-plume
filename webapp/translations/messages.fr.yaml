@@ -11,6 +11,7 @@ error:
     title: Vous n'avez pas accès à cette page
     connected_as:
       admin: Vous êtes connecté en tant qu'administrateur.
+      plume_user: Vous êtes connecté en tant qu'utilisateur.
       unknown: --
     disconnected: Vous n'êtes pas connecté.
   back_to_home: Retour à l'accueil
@@ -23,6 +24,9 @@ home:
 
 app_home:
   title: Rédigez votre article avec Plume
+
+app_article_waiting_page:
+  title: Article en cours de génération
 
 article:
   type:
