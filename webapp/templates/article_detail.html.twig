@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                {% if not error and article.content is not same as(null) %}
+                    <h1 class="h3 text-center text-primary mt-5 mb-3">{{ article.requestedTopic }}</h1>
+                    <div class="card mb-5">
+                        <div class="card-body">
+                            {{ article.content | raw }}
+                        </div>
+                    </div>
+                {% else %}
+                    <p>{{ 'app_article_detail_page.error' | trans }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

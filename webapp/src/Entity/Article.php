@@ -77,6 +77,9 @@ class Article
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $articleGeneratedAt = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $content = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -162,6 +165,18 @@ class Article
     public function setArticleGeneratedAt(?DateTimeImmutable $articleGeneratedAt): static
     {
         $this->articleGeneratedAt = $articleGeneratedAt;
+
+        return $this;
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    public function setContent(?string $content): static
+    {
+        $this->content = $content;
 
         return $this;
     }

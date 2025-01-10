@@ -28,3 +28,18 @@ services:
   Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
     arguments:
       $redis: "@snc_redis.session"
+
+  Aws\S3\S3Client:
+    factory: [ Aws\S3\S3Client, 'factory' ]
+    arguments:
+      - version: '2006-03-01'
+        region: '%env(S3_STORAGE_REGION)%'
+        credentials:
+          key: '%env(S3_STORAGE_ACCESS_KEY)%'
+          secret: '%env(S3_STORAGE_SECRET_KEY)%'
+        endpoint: '%env(S3_STORAGE_ENDPOINT_URL)%'
+
+  App\Service\ArticleService:
+    arguments:
+      $bucketName: '%env(S3_STORAGE_BUCKET_NAME)%'
+      $uploadDirectory: '%env(S3_STORAGE_UPLOAD_DIRECTORY)%'

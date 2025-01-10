@@ -40,6 +40,8 @@ app_article_waiting_page:
     stage: "Étape: "
     error: Une erreur est survenue
 
+app_article_detail_page:
+  error: Une erreur est survenue, veuillez rafraîchir la page.
 
 article:
   type:
