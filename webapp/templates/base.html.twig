@@ -1,6 +1,6 @@
 {% set locale = app.request.locale|slice(0, 2) %}
 <!DOCTYPE html>
-<html lang="{{ locale }}">
+<html lang="{{ locale }}" data-symfony-ux-translator-locale="{{ locale }}">
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}{{ app_name }}{% endblock %}</title>
@@ -20,6 +20,7 @@
         <div id="body-wrapper">
             {% include '_navbar.html.twig' %}
             <div id="main">
+                {% include '_flash.html.twig' %}
                 {% block body %}{% endblock %}
             </div>
         </div>

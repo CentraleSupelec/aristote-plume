@@ -24,15 +24,36 @@ home:
 
 app_home:
   title: Rédigez votre article avec Plume
+  error:
+    api_ko_response: Une erreur est survenue, la génération de l'article n'a pas pu démarrer. Veuillez réessayer.
+    api_invalid_response: Une erreur est survenue, la génération de l'article a échoué. Veuillez réessayer.
+    api_exception: Une erreur est survenue lors la génération de l'article. Veuillez réessayer.
 
 app_article_waiting_page:
   title: Article en cours de génération
+  card_body:
+    description: Informations sur votre article
+    title: "Sujet abordé: "
+    type: "Type: "
+    language: "Langue: "
+    language_model: "Modèle de langue: "
+    stage: "Étape: "
+    error: Une erreur est survenue
+
 
 article:
   type:
     economics: Économie
     literature: Littérature
     science: Sciences
+  stage:
+    unknown: Inconnue
+    initialization: Initialisation
+    knowledge_curation: Brainstorming
+    outline_generation: Génération du plan
+    article_generation: Génération du brouillon
+    article_polish: Rédaction
+    post_run: Finalisation
   generation_model:
     aristote: Aristote (Llama 3.0 70B)
   language:

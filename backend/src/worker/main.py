@@ -39,7 +39,7 @@ def generate_article(article_request_dict: dict) -> None:
         state=ArticleGenerationTaskStatus.PROGRESS.value,
         meta={
             "stage": ArticleProgressStage.INITIALIZATION.value,
-            "total_stages": TOTAL_PROGRESS_STAGES,
+            "total_stage_count": TOTAL_PROGRESS_STAGES,
             "stage_number": get_stage_index(ArticleProgressStage.INITIALIZATION),
             "stage_start_date": datetime.now(ZoneInfo("Europe/Paris")).strftime(
                 "%Y-%m-%d %H:%M:%S"
@@ -100,7 +100,7 @@ def generate_article(article_request_dict: dict) -> None:
         state=ArticleGenerationTaskStatus.PROGRESS.value,
         meta={
             "stage": ArticleProgressStage.POST_RUN.value,
-            "total_stages": TOTAL_PROGRESS_STAGES,
+            "total_stage_count": TOTAL_PROGRESS_STAGES,
             "stage_number": get_stage_index(ArticleProgressStage.POST_RUN),
             "stage_start_date": datetime.now(ZoneInfo("Europe/Paris")).strftime(
                 "%Y-%m-%d %H:%M:%S"

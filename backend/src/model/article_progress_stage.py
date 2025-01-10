@@ -4,12 +4,12 @@ TOTAL_PROGRESS_STAGES = 5
 
 
 class ArticleProgressStage(Enum):
-    INITIALIZATION = "article.progress.initialization"
-    KNOWLEDGE_CURATION = "article.progress.knowledge_curation"
-    OUTLINE_GENERATION = "article.progress.outline_generation"
-    ARTICLE_GENERATION = "article.progress.article_generation"
-    ARTICLE_POLISH = "article.progress.article_polish"
-    POST_RUN = "article.progress.post_run"
+    INITIALIZATION = "initialization"
+    KNOWLEDGE_CURATION = "knowledge_curation"
+    OUTLINE_GENERATION = "outline_generation"
+    ARTICLE_GENERATION = "article_generation"
+    ARTICLE_POLISH = "article_polish"
+    POST_RUN = "post_run"
 
 
 def get_stage_index(stage: ArticleProgressStage) -> int:

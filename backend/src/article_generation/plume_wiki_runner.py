@@ -100,7 +100,7 @@ class PlumeWikiRunner(STORMWikiRunner):
                 state=ArticleGenerationTaskStatus.PROGRESS.value,
                 meta={
                     "stage": ArticleProgressStage.KNOWLEDGE_CURATION.value,
-                    "total_stages": TOTAL_PROGRESS_STAGES,
+                    "total_stage_count": TOTAL_PROGRESS_STAGES,
                     "stage_number": get_stage_index(
                         ArticleProgressStage.KNOWLEDGE_CURATION
                     ),
@@ -119,7 +119,7 @@ class PlumeWikiRunner(STORMWikiRunner):
                 state=ArticleGenerationTaskStatus.PROGRESS.value,
                 meta={
                     "stage": ArticleProgressStage.OUTLINE_GENERATION.value,
-                    "total_stages": TOTAL_PROGRESS_STAGES,
+                    "total_stage_count": TOTAL_PROGRESS_STAGES,
                     "stage_number": get_stage_index(
                         ArticleProgressStage.OUTLINE_GENERATION
                     ),
@@ -144,7 +144,7 @@ class PlumeWikiRunner(STORMWikiRunner):
                 state=ArticleGenerationTaskStatus.PROGRESS.value,
                 meta={
                     "stage": ArticleProgressStage.ARTICLE_GENERATION.value,
-                    "total_stages": TOTAL_PROGRESS_STAGES,
+                    "total_stage_count": TOTAL_PROGRESS_STAGES,
                     "stage_number": get_stage_index(
                         ArticleProgressStage.ARTICLE_GENERATION
                     ),
@@ -176,7 +176,7 @@ class PlumeWikiRunner(STORMWikiRunner):
                 state=ArticleGenerationTaskStatus.PROGRESS.value,
                 meta={
                     "stage": ArticleProgressStage.ARTICLE_POLISH.value,
-                    "total_stages": TOTAL_PROGRESS_STAGES,
+                    "total_stage_count": TOTAL_PROGRESS_STAGES,
                     "stage_number": get_stage_index(
                         ArticleProgressStage.ARTICLE_POLISH
                     ),

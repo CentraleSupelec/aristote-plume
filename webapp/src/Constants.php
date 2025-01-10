@@ -44,4 +44,29 @@ final class Constants
     {
         return [Article::ARTICLE_LANGUAGE_EN, Article::ARTICLE_LANGUAGE_FR];
     }
+
+    public static function getAvailableArticleProgressStages(): array
+    {
+        return [
+            'initialization',
+            'knowledge_curation',
+            'outline_generation',
+            'article_generation',
+            'article_polish',
+            'post_run',
+        ];
+    }
+
+    public static function getAvailableArticleTaskStatuses(): array
+    {
+        return [
+            Article::ARTICLE_GENERATION_TASK_STATUS_PENDING,
+            Article::ARTICLE_GENERATION_TASK_STATUS_STARTED,
+            Article::ARTICLE_GENERATION_TASK_STATUS_PROGRESS,
+            Article::ARTICLE_GENERATION_TASK_STATUS_SUCCESS,
+            Article::ARTICLE_GENERATION_TASK_STATUS_FAILURE,
+            Article::ARTICLE_GENERATION_TASK_STATUS_RETRY,
+            Article::ARTICLE_GENERATION_TASK_STATUS_REVOKED,
+        ];
+    }
 }

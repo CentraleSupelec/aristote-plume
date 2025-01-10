@@ -19,16 +19,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['generationTaskId'])]
 class Article
 {
+    use TimestampableEntity;
     final public const ARTICLE_TYPE_SCIENCE = 'science';
     final public const ARTICLE_TYPE_ECONOMICS = 'economics';
     final public const ARTICLE_TYPE_LITERATURE = 'literature';
     final public const ARTICLE_LANGUAGE_FR = 'fr';
     final public const ARTICLE_LANGUAGE_EN = 'en';
 
+    final public const ARTICLE_GENERATION_TASK_STATUS_PENDING = 'PENDING';
+    final public const ARTICLE_GENERATION_TASK_STATUS_STARTED = 'STARTED';
+    final public const ARTICLE_GENERATION_TASK_STATUS_PROGRESS = 'PROGRESS';
+    final public const ARTICLE_GENERATION_TASK_STATUS_SUCCESS = 'SUCCESS';
+    final public const ARTICLE_GENERATION_TASK_STATUS_FAILURE = 'FAILURE';
+    final public const ARTICLE_GENERATION_TASK_STATUS_RETRY = 'RETRY';
+    final public const ARTICLE_GENERATION_TASK_STATUS_REVOKED = 'REVOKED';
+
     final public const CREATION_REQUEST_GROUP = 'CREATION_REQUEST';
     final public const WAIT_FOR_GENERATION_GROUP = 'WAIT_FOR_GENERATION';
-
-    use TimestampableEntity;
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
