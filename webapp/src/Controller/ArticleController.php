@@ -167,7 +167,7 @@ class ArticleController extends AbstractController
                 } elseif (in_array($articleProgressStatusDto->getTaskStatus(), [
                     Article::ARTICLE_GENERATION_TASK_STATUS_PENDING,
                     Article::ARTICLE_GENERATION_TASK_STATUS_STARTED,
-                    Article::ARTICLE_GENERATION_TASK_STATUS_PROGRESS
+                    Article::ARTICLE_GENERATION_TASK_STATUS_PROGRESS,
                 ])) {
                     // TODO: pending status => check on s3 if folder exists and is complete
 
@@ -186,7 +186,6 @@ class ArticleController extends AbstractController
                     'error' => true,
                 ]);
             }
-
         }
 
         $error = false;
@@ -200,7 +199,7 @@ class ArticleController extends AbstractController
 
         return $this->render('article_detail.html.twig', [
             'article' => $article,
-            'error' => $error
+            'error' => $error,
         ]);
     }
 }

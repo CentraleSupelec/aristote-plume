@@ -20,8 +20,7 @@ readonly class ArticleService
         private EntityManagerInterface $entityManager,
         private string $bucketName,
         private string $uploadDirectory,
-    )
-    {
+    ) {
         $this->commonMarkConverter = new CommonMarkConverter([
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
@@ -106,8 +105,8 @@ readonly class ArticleService
 
         $fullSourcesArray = json_decode($json, true);
         if (
-            !array_key_exists('url_to_unified_index', $fullSourcesArray) ||
-            !array_key_exists('url_to_info', $fullSourcesArray)
+            !array_key_exists('url_to_unified_index', $fullSourcesArray)
+            || !array_key_exists('url_to_info', $fullSourcesArray)
         ) {
             throw new Exception('Invalid sources JSON file (key "url_to_unified_index" or key "url_to_info" not found).');
         }
