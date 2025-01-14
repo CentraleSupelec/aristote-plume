@@ -127,8 +127,7 @@ python_api_build:
         --dockerfile ${CI_PROJECT_DIR}/backend/docker/Dockerfile \
         --target python_api \
         --destination ${REGISTRY_HOSTNAME}/aristote-storm/python-api:${CI_COMMIT_REF_NAME} \
-        --cache-repo=${CI_REGISTRY}/disi/innovation/aristote/aristote-storm/python-api-cache \
-        --cache=true \
+        --cache=false \
         --push-retry 4 \
         --snapshot-mode=redo \
         --use-new-run=true \
@@ -143,8 +142,7 @@ python_worker_build:
         --dockerfile ${CI_PROJECT_DIR}/backend/docker/Dockerfile \
         --target python_worker \
         --destination ${REGISTRY_HOSTNAME}/aristote-storm/python-worker:${CI_COMMIT_REF_NAME} \
-        --cache-repo=${CI_REGISTRY}/disi/innovation/aristote/aristote-storm/python-worker-cache \
-        --cache=true \
+        --cache=false \
         --push-retry 4 \
         --snapshot-mode=redo \
         --use-new-run=true \

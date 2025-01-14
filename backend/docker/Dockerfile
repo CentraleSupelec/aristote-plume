@@ -3,7 +3,7 @@ FROM python:3.12-slim-bookworm AS python_base
 WORKDIR /backend
 COPY ./requirements.txt requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN python -m pip install --upgrade pip && pip install --no-cache-dir --upgrade -r requirements.txt
 
 COPY ./src src
 COPY ./config config
