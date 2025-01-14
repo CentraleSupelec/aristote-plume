@@ -8,6 +8,7 @@ use App\Form\ArticleCreationType;
 use App\Model\ArticleCreationTaskDto;
 use App\Model\ArticleProgressStatusDto;
 use App\Repository\ArticleRepository;
+use App\Security\Voter\ArticleVoter;
 use App\Service\ArticleService;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -105,12 +106,14 @@ class ArticleController extends AbstractController
     }
 
     #[Route('/{id}/wait-for-generation', name: 'article_waiting_page')]
+    #[IsGranted(ArticleVoter::USER_CAN_VIEW_ARTICLE, subject: 'article')]
     public function waitForArticleGeneration(Article $article): Response
     {
         return $this->render('article_waiting_page.html.twig', ['article' => $article]);
     }
 
     #[Route('/{id}/check-for-status', name: 'article_check_status', options: ['expose' => true])]
+    #[IsGranted(ArticleVoter::USER_CAN_VIEW_ARTICLE, subject: 'article')]
     public function checkArticleStatus(
         Article $article,
         HttpClientInterface $fastApiClient,
@@ -148,6 +151,7 @@ class ArticleController extends AbstractController
     }
 
     #[Route('/{id}', name: 'article_detail_page', options: ['expose' => true])]
+    #[IsGranted(ArticleVoter::USER_CAN_VIEW_ARTICLE, subject: 'article')]
     public function viewArticle(
         Article $article,
         ArticleService $articleService,
