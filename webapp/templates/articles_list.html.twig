@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block paginationRelLinks %}
+    {{ knp_pagination_rel_links(pagination) }}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+
+                <div class="mt-5 d-flex justify-content-end">
+                    <a class="btn btn-primary" href="{{ path('article_create') }}">
+                        <span class="me-2"><i class="fa-solid fa-plus"></i></span>
+                        {{ 'app_articles_list.call_to_action' | trans }}
+                    </a>
+                </div>
+
+                <h1 class="h3 text-center mt-2 mb-3">{{ 'app_articles_list.title' | trans }}</h1>
+
+                {% if pagination.count %}
+                    <ul class="list-group list-group-flush">
+                        {% for article in pagination %}
+                            <li class="list-group-item">
+                                <div>
+                                    <a href="{{ path('article_detail_page', {id: article.id}) }}">
+                                        {{ article.requestedTopic }}
+                                    </a>
+                                    <p class="m-0 text-muted">
+                                        {{ ('article.language.' ~ article.requestedLanguage) | trans }} |
+                                        {{ ('article.type.' ~ article.requestedType) | trans }} |
+                                        {{ article.requestedLanguageModel }}
+                                    </p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="navigation d-flex justify-content-center">
+                        {{ knp_pagination_render(pagination) }}
+                    </div>
+                {% else %}
+                    <p class="text-center">{{ 'app_articles_list.no_data' | trans }}</p>
+                    <div class="d-flex justify-content-center">
+                        <a class="btn btn-primary" href="{{ path('article_create') }}">
+                            <span class="me-2"><i class="fa-solid fa-plus"></i></span>
+                            {{ 'app_articles_list.call_to_action_no_data' | trans }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

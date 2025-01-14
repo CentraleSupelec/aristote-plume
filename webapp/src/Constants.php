@@ -22,9 +22,7 @@ final class Constants
 
     public static function getArticleGenerationModels(): array
     {
-        return [
-            'article.generation_model.aristote' => 'casperhansen/llama-3-70b-instruct-awq',
-        ];
+        return ['casperhansen/llama-3-70b-instruct-awq' => 'casperhansen/llama-3-70b-instruct-awq'];
     }
 
     public static function getAvailableArticleGenerationModels(): array

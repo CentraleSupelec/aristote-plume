@@ -7,11 +7,13 @@ use App\Entity\PlumeUser;
 use App\Form\ArticleCreationType;
 use App\Model\ArticleCreationTaskDto;
 use App\Model\ArticleProgressStatusDto;
+use App\Repository\ArticleRepository;
 use App\Service\ArticleService;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Knp\Component\Pager\PaginatorInterface;
 use League\CommonMark\Exception\CommonMarkException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,8 +35,24 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[IsGranted(PlumeUser::ROLE_DEFAULT)]
 class ArticleController extends AbstractController
 {
-    #[Route('/', name: 'app_home')]
-    public function index(
+    #[Route('/', name: 'articles_list')]
+    public function listArticles(
+        ArticleRepository $articleRepository,
+        PaginatorInterface $paginator,
+        #[CurrentUser] PlumeUser $plumeUser,
+        Request $request,
+    ): Response {
+        $pagination = $paginator->paginate(
+            $articleRepository->getArticlesForUserQueryBuilder($plumeUser),
+            $request->query->getInt('page', 1),
+            20
+        );
+
+        return $this->render('articles_list.html.twig', ['pagination' => $pagination]);
+    }
+
+    #[Route('/create', name: 'article_create')]
+    public function createArticle(
         #[CurrentUser] PlumeUser $user,
         Request $request,
         EntityManagerInterface $entityManager,
@@ -54,9 +72,9 @@ class ArticleController extends AbstractController
                 ]);
 
                 if (Response::HTTP_OK !== $response->getStatusCode()) {
-                    $this->addFlash('danger', 'app_home.error.api_ko_response');
+                    $this->addFlash('danger', 'app_article_create.error.api_ko_response');
 
-                    return $this->render('app_home.html.twig', ['form' => $form]);
+                    return $this->render('article_create.html.twig', ['form' => $form]);
                 }
 
                 $articleCreationTaskDto = $serializer->deserialize(
@@ -64,9 +82,9 @@ class ArticleController extends AbstractController
                 );
                 $errors = $validator->validate($articleCreationTaskDto);
                 if (count($errors) > 0) {
-                    $this->addFlash('danger', 'app_home.error.api_invalid_response');
+                    $this->addFlash('danger', 'app_article_create.error.api_invalid_response');
 
-                    return $this->render('app_home.html.twig', ['form' => $form]);
+                    return $this->render('article_create.html.twig', ['form' => $form]);
                 }
 
                 $article->setGenerationTaskId($articleCreationTaskDto->getId());
@@ -78,12 +96,12 @@ class ArticleController extends AbstractController
                     'article_waiting_page', ['id' => $article->getId()]
                 );
             } catch (TransportExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface $e) {
-                $this->addFlash('danger', 'app_home.error.api_exception');
+                $this->addFlash('danger', 'app_article_create.error.api_exception');
                 $logger->error($e);
             }
         }
 
-        return $this->render('app_home.html.twig', ['form' => $form]);
+        return $this->render('article_create.html.twig', ['form' => $form]);
     }
 
     #[Route('/{id}/wait-for-generation', name: 'article_waiting_page')]

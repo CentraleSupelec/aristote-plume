@@ -16,18 +16,27 @@ error:
     disconnected: Vous n'êtes pas connecté.
   back_to_home: Retour à l'accueil
 
+common:
+  back: Retour
+
 home:
   title: Plume
   subtitle: Le module de génération d'articles d'Aristote
   description: Avec Plume, rédigez des synthèses scientifiques au format "article Wikipédia"
   link_to_app: Accéder à l'application
 
-app_home:
+app_article_create:
   title: Rédigez votre article avec Plume
   error:
     api_ko_response: Une erreur est survenue, la génération de l'article n'a pas pu démarrer. Veuillez réessayer.
     api_invalid_response: Une erreur est survenue, la génération de l'article a échoué. Veuillez réessayer.
     api_exception: Une erreur est survenue lors la génération de l'article. Veuillez réessayer.
+
+app_articles_list:
+  title: Vos articles
+  call_to_action: Générer un nouvel article
+  no_data: Vous n'avez généré aucun article.
+  call_to_action_no_data: Je génère mon premier article
 
 app_article_waiting_page:
   title: Article en cours de génération
@@ -56,12 +65,9 @@ article:
     article_generation: Génération du brouillon
     article_polish: Rédaction
     post_run: Finalisation
-  generation_model:
-    aristote: Aristote (Llama 3.0 70B)
   language:
     fr: Français
     en: Anglais
-    query: Langue de la question
   form:
     requested_topic:
       label: Objet de la rédaction

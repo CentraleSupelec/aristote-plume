@@ -13,6 +13,6 @@ class PlumeUserController extends CRUDController
         /** @var PlumeUser $plumeUser */
         $plumeUser = $this->admin->getSubject();
 
-        return $this->redirectToRoute('app_home', ['_switch_user' => $plumeUser->getEmail()]);
+        return $this->redirectToRoute('articles_list', ['_switch_user' => $plumeUser->getEmail()]);
     }
 }
