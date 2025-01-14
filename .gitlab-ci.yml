@@ -69,7 +69,7 @@ black:
   before_script:
     # Login to registry
     - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"$REGISTRY_HOSTNAME\":{\"username\":\"$REGISTRY_CI_USERNAME\",\"password\":\"$REGISTRY_CI_PASSWORD\"}, \"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - echo "{\"auths\":{\"${REGISTRY_HOSTNAME}\":{\"username\":\"${REGISTRY_USERNAME}\",\"password\":\"${REGISTRY_PASSWORD}\"}, \"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
   tags:
     - docker
   only:
@@ -155,7 +155,7 @@ docker_images_security:
   image: docker:20
   before_script:
     - mkdir -p ~/.docker
-    - echo "{\"auths\":{\"${REGISTRY_HOSTNAME}\":{\"username\":\"${REGISTRY_CI_USERNAME}\",\"password\":\"${REGISTRY_CI_PASSWORD}\"}}}" > ~/.docker/config.json
+    - echo "{\"auths\":{\"${REGISTRY_HOSTNAME}\":{\"username\":\"${REGISTRY_USERNAME}\",\"password\":\"${REGISTRY_PASSWORD}\"}}}" > ~/.docker/config.json
   script:
     - apk update && apk upgrade && apk add curl
     - curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
