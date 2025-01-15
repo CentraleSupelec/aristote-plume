@@ -10,7 +10,7 @@ fastapi_app = FastAPI()
 
 
 @fastapi_app.get("/health")
-def get_task_status() -> str:
+def get_app_health() -> str:
     return "OK"
 
 
