@@ -50,7 +50,6 @@ COPY config config
 COPY migrations migrations
 RUN mkdir public
 COPY public/index.php public
-COPY public/favicon.ico public
 COPY src src
 COPY templates templates
 COPY translations translations

@@ -13,6 +13,8 @@ cache:
 
 stages:
   - tests
+  - build
+  - images_scan
 
 .php_test_template: &php_test_template
   stage: tests
@@ -58,3 +60,108 @@ black:
   <<: *python_test_template
   script:
     - black src --check
+
+.kaniko_build_template: &kaniko_build_template
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [ "" ]
+  before_script:
+    # Login to registry
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"${REGISTRY_HOSTNAME}\":{\"username\":\"${REGISTRY_USERNAME}\",\"password\":\"${REGISTRY_PASSWORD}\"}, \"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  tags:
+    - docker
+  only:
+    - tags
+  cache: {}
+
+webapp_build:
+  <<: *kaniko_build_template
+  script:
+    - >
+      /kaniko/executor \
+        --context ${CI_PROJECT_DIR}/webapp \
+        --dockerfile ${CI_PROJECT_DIR}/webapp/docker/nginx/Dockerfile.prod \
+        --target assets-prod \
+        --destination ${CI_REGISTRY}/disi/innovation/aristote/aristote-storm/webapp-assets:${CI_COMMIT_REF_NAME} \
+        --cache-repo=${CI_REGISTRY}/disi/innovation/aristote/aristote-storm/webapp-nginx-cache \
+        --cache=true \
+        --push-retry 4 \
+        --snapshot-mode=redo \
+        --use-new-run=true \
+        --cleanup
+    - >
+      /kaniko/executor \
+        --context ${CI_PROJECT_DIR}/webapp \
+        --dockerfile ${CI_PROJECT_DIR}/webapp/docker/php/Dockerfile \
+        --build-arg ASSETS_BUILD=${CI_REGISTRY}/disi/innovation/aristote/aristote-storm/webapp-assets:${CI_COMMIT_REF_NAME} \
+        --target php_prod \
+        --destination ${REGISTRY_HOSTNAME}/aristote-storm/webapp-php:${CI_COMMIT_REF_NAME} \
+        --cache-repo=${CI_REGISTRY}/disi/innovation/aristote/aristote-storm/webapp-php-cache \
+        --cache=true \
+        --push-retry 4 \
+        --snapshot-mode=redo \
+        --use-new-run=true \
+        --cleanup
+    - >
+      /kaniko/executor \
+        --context ${CI_PROJECT_DIR}/webapp \
+        --dockerfile ${CI_PROJECT_DIR}/webapp/docker/nginx/Dockerfile.prod \
+        --build-arg PHP_BUILD=${REGISTRY_HOSTNAME}/aristote-storm/webapp-php:${CI_COMMIT_REF_NAME} \
+        --target nginx \
+        --destination ${REGISTRY_HOSTNAME}/aristote-storm/webapp-nginx:${CI_COMMIT_REF_NAME} \
+        --cache-repo=${CI_REGISTRY}/disi/innovation/aristote/aristote-storm/webapp-nginx-cache \
+        --cache=true \
+        --push-retry 4 \
+        --snapshot-mode=redo \
+        --use-new-run=true \
+        --cleanup
+
+python_api_build:
+  <<: *kaniko_build_template
+  script:
+    - >
+      /kaniko/executor \
+        --context ${CI_PROJECT_DIR}/backend \
+        --dockerfile ${CI_PROJECT_DIR}/backend/docker/Dockerfile \
+        --target python_api \
+        --destination ${REGISTRY_HOSTNAME}/aristote-storm/python-api:${CI_COMMIT_REF_NAME} \
+        --cache=false \
+        --push-retry 4 \
+        --snapshot-mode=redo \
+        --use-new-run=true \
+        --cleanup
+
+python_worker_build:
+  <<: *kaniko_build_template
+  script:
+    - >
+      /kaniko/executor \
+        --context ${CI_PROJECT_DIR}/backend \
+        --dockerfile ${CI_PROJECT_DIR}/backend/docker/Dockerfile \
+        --target python_worker \
+        --destination ${REGISTRY_HOSTNAME}/aristote-storm/python-worker:${CI_COMMIT_REF_NAME} \
+        --cache=false \
+        --push-retry 4 \
+        --snapshot-mode=redo \
+        --use-new-run=true \
+        --cleanup
+
+docker_images_security:
+  stage: images_scan
+  image: docker:20
+  before_script:
+    - mkdir -p ~/.docker
+    - echo "{\"auths\":{\"${REGISTRY_HOSTNAME}\":{\"username\":\"${REGISTRY_USERNAME}\",\"password\":\"${REGISTRY_PASSWORD}\"}}}" > ~/.docker/config.json
+  script:
+    - apk update && apk upgrade && apk add curl
+    - curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+    - grype ${REGISTRY_HOSTNAME}/aristote-storm/webapp-php:${CI_COMMIT_REF_NAME}
+    - grype ${REGISTRY_HOSTNAME}/aristote-storm/webapp-nginx:${CI_COMMIT_REF_NAME}
+    - grype ${REGISTRY_HOSTNAME}/aristote-storm/python-api:${CI_COMMIT_REF_NAME}
+    - grype ${REGISTRY_HOSTNAME}/aristote-storm/python-worker:${CI_COMMIT_REF_NAME}
+  tags:
+    - docker
+  only:
+    - tags

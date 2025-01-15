@@ -1,0 +1,43 @@
+ARG PHP_BUILD=php
+FROM $PHP_BUILD AS php-build
+
+FROM illuin/symfony-ready:8.2-node-20 AS assets-prod
+
+WORKDIR /app
+
+RUN apk update && apk upgrade && \
+    apk add --no-cache git python3 make g++
+
+COPY bin bin
+COPY config config
+COPY assets assets
+COPY public public
+COPY src src
+COPY translations translations
+COPY package.json \
+    package-lock.json \
+    tsconfig.json \
+    composer.json \
+    composer.lock \
+    symfony.lock \
+    webpack.config.js \
+    .env \
+    ./
+
+RUN echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini \
+    && chmod +x bin/console \
+    && composer install --no-interaction \
+    && npm ci \
+    && npm run build
+
+FROM nginx:1.27-alpine3.20 AS nginx
+
+WORKDIR /app/public
+
+RUN apk update && apk upgrade
+
+COPY --from=assets-prod /app/public /app/public
+COPY --from=assets-prod /app/var/cache/fosRoutes.json /app/var/cache/fosRoutes.json
+COPY --from=php-build /app/public/bundles /app/public/bundles
+
+COPY docker/nginx/default-prod.conf.template /etc/nginx/templates/default.conf.template
