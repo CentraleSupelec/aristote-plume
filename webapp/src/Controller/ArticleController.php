@@ -150,7 +150,7 @@ class ArticleController extends AbstractController
         }
     }
 
-    #[Route('/{id}', name: 'article_detail_page', options: ['expose' => true])]
+    #[Route('/{id}/detail', name: 'article_detail_page', options: ['expose' => true])]
     #[IsGranted(ArticleVoter::USER_CAN_VIEW_ARTICLE, subject: 'article')]
     public function viewArticle(
         Article $article,
