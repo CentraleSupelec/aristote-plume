@@ -52,6 +52,8 @@ services:
       context: ./backend
       target: python_api
     command:
+      - python
+      - -m
       - fastapi
       - dev
       - /backend/src/api/main.py
