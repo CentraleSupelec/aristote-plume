@@ -87,7 +87,9 @@ def generate_article(article_request_dict: dict) -> None:
         max_thread_num=10,
     )
     rm = ArxivRM(k=engine_args.search_top_k)
-    runner = PlumeWikiRunner(engine_args, lm_configs, rm)
+    runner = PlumeWikiRunner(
+        engine_args, lm_configs, rm, article_request.requested_language
+    )
     runner.run(
         topic=article_request.requested_topic,
         do_research=True,
