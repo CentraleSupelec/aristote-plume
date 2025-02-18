@@ -7,6 +7,7 @@ from typing import List, Union
 
 from celery import Task
 from knowledge_storm import (
+    StormPersonaGenerator,
     STORMWikiRunner,
     STORMWikiRunnerArguments,
     STORMWikiLMConfigs,
@@ -18,8 +19,18 @@ from knowledge_storm.storm_wiki.modules.storm_dataclass import (
     StormInformationTable,
     StormArticle,
 )
-
-from config.settings import get_settings, Settings
+from src.article_generation.plume_storm_article_generation_module import (
+    PlumeStormArticleGenerationModule,
+)
+from src.article_generation.plume_storm_article_polishing_module import (
+    PlumeStormArticlePolishingModule,
+)
+from src.article_generation.plume_storm_knowledge_curation_module import (
+    PlumeStormKnowledgeCurationModule,
+)
+from src.article_generation.plume_storm_outline_generation_module import (
+    PlumeStormOutlineGenerationModule,
+)
 from src.model.article_progress_stage import (
     ArticleProgressStage,
     TOTAL_PROGRESS_STAGES,
@@ -27,6 +38,7 @@ from src.model.article_progress_stage import (
 )
 from src.model.article_generation_task_status import ArticleGenerationTaskStatus
 from src.article_generation.s3_storage_service import S3StorageService
+from config.settings import get_settings, Settings
 
 logger = logging.getLogger(__name__)
 settings: Settings = get_settings()
@@ -34,9 +46,41 @@ settings: Settings = get_settings()
 
 class PlumeWikiRunner(STORMWikiRunner):
     def __init__(
-        self, args: STORMWikiRunnerArguments, lm_configs: STORMWikiLMConfigs, rm
+        self,
+        args: STORMWikiRunnerArguments,
+        lm_configs: STORMWikiLMConfigs,
+        rm,
+        language: str,
     ):
         super().__init__(args=args, lm_configs=lm_configs, rm=rm)
+        storm_persona_generator = StormPersonaGenerator(
+            self.lm_configs.question_asker_lm
+        )
+        self.storm_knowledge_curation_module = PlumeStormKnowledgeCurationModule(
+            retriever=self.retriever,
+            persona_generator=storm_persona_generator,
+            conv_simulator_lm=self.lm_configs.conv_simulator_lm,
+            question_asker_lm=self.lm_configs.question_asker_lm,
+            max_search_queries_per_turn=self.args.max_search_queries_per_turn,
+            search_top_k=self.args.search_top_k,
+            max_conv_turn=self.args.max_conv_turn,
+            max_thread_num=self.args.max_thread_num,
+            language=language,
+        )
+        self.storm_article_generation = PlumeStormArticleGenerationModule(
+            article_gen_lm=self.lm_configs.article_gen_lm,
+            retrieve_top_k=self.args.retrieve_top_k,
+            max_thread_num=self.args.max_thread_num,
+            language=language,
+        )
+        self.storm_outline_generation_module = PlumeStormOutlineGenerationModule(
+            outline_gen_lm=self.lm_configs.outline_gen_lm, language=language
+        )
+        self.storm_article_polishing_module = PlumeStormArticlePolishingModule(
+            article_gen_lm=self.lm_configs.article_gen_lm,
+            article_polish_lm=self.lm_configs.article_polish_lm,
+            language=language,
+        )
 
         self.topic = ""
         self.article_dir_name = ""

@@ -26,7 +26,7 @@ class ArticleCreationType extends AbstractType
             ->add('requestedLanguage', ChoiceType::class, [
                 'label' => 'article.form.requested_language.label',
                 'choices' => Constants::getArticleLanguages(),
-                'disabled' => true,
+                'disabled' => false,
             ])
             ->add('requestedLanguageModel', ChoiceType::class, [
                 'label' => 'article.form.requested_language_model.label',
