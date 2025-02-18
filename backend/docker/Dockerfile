@@ -5,7 +5,7 @@ WORKDIR /backend
 COPY ./requirements.txt .
 
 RUN apt-get update && \
-    apt-get upgrade && \
+    apt-get upgrade -y && \
     chown pyuser:pyuser requirements.txt && \
     su - pyuser -c "python -m pip install --upgrade pip" && \
     su - pyuser -c "pip install --no-cache-dir --upgrade -r /backend/requirements.txt" && \
