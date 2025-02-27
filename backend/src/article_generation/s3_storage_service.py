@@ -2,6 +2,7 @@ import logging
 import os
 
 import boto3
+from botocore.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,10 @@ class S3StorageService:
             aws_access_key_id=s3_storage_access_key,
             aws_secret_access_key=s3_storage_secret_key,
             endpoint_url=s3_storage_endpoint_url,
+            config=Config(
+                request_checksum_calculation="when_required",
+                response_checksum_validation="when_required",
+            ),
         )
         self.s3_storage_bucket_name = s3_storage_bucket_name
         self.s3_storage_upload_directory = s3_storage_upload_directory
