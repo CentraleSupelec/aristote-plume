@@ -64,9 +64,8 @@ class Article
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
-    #[Assert\Choice(callback: [Constants::class, 'getAvailableArticleGenerationModels'])]
     #[Groups([self::CREATION_REQUEST_GROUP, self::WAIT_FOR_GENERATION_GROUP])]
-    private ?string $requestedLanguageModel = 'casperhansen/llama-3-70b-instruct-awq';
+    private ?string $requestedLanguageModel = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]

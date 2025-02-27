@@ -20,16 +20,6 @@ final class Constants
         return [Article::ARTICLE_TYPE_SCIENCE, Article::ARTICLE_TYPE_ECONOMICS, Article::ARTICLE_TYPE_LITERATURE];
     }
 
-    public static function getArticleGenerationModels(): array
-    {
-        return ['casperhansen/llama-3-70b-instruct-awq' => 'casperhansen/llama-3-70b-instruct-awq'];
-    }
-
-    public static function getAvailableArticleGenerationModels(): array
-    {
-        return ['casperhansen/llama-3-70b-instruct-awq'];
-    }
-
     public static function getArticleLanguages(): array
     {
         return [

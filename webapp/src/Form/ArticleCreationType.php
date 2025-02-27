@@ -26,18 +26,19 @@ class ArticleCreationType extends AbstractType
             ->add('requestedLanguage', ChoiceType::class, [
                 'label' => 'article.form.requested_language.label',
                 'choices' => Constants::getArticleLanguages(),
-                'disabled' => false,
             ])
             ->add('requestedLanguageModel', ChoiceType::class, [
                 'label' => 'article.form.requested_language_model.label',
-                'choices' => Constants::getArticleGenerationModels(),
-                'disabled' => true,
+                'choices' => $options['available_models'],
             ])
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => Article::class]);
+        $resolver->setDefaults([
+            'data_class' => Article::class,
+            'available_models' => [],
+        ]);
     }
 }
