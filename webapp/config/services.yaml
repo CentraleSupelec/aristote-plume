@@ -46,3 +46,7 @@ services:
     arguments:
       $bucketName: '%env(S3_STORAGE_BUCKET_NAME)%'
       $uploadDirectory: '%env(S3_STORAGE_UPLOAD_DIRECTORY)%'
+
+  App\Security\PlumeUser\PlumeUserProvider:
+    arguments:
+      $autoCreateAccount: '%env(bool:AUTO_CREATE_USER_ACCOUNT)%'

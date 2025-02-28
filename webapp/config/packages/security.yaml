@@ -19,6 +19,7 @@ security:
         client: administrator
         login_path: administrator_login_oidc
         check_path: administrator_login_check
+        failure_path: administrator_access_denied
         user_identifier_property: '%oidc_user_identifier_property%'
         enable_end_session_listener: true
         user_identifier_from_idtoken: '%oidc_user_identifier_from_id_token%'
@@ -36,6 +37,7 @@ security:
         client: plume_user
         login_path: plume_user_login_oidc
         check_path: plume_user_login_check
+        failure_path: plume_user_access_denied
         user_identifier_property: '%oidc_user_identifier_property%'
         enable_end_session_listener: true
         user_identifier_from_idtoken: '%oidc_user_identifier_from_id_token%'
