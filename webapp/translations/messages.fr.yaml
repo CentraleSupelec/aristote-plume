@@ -31,6 +31,7 @@ app_article_create:
     api_ko_response: Une erreur est survenue, la génération de l'article n'a pas pu démarrer. Veuillez réessayer.
     api_invalid_response: Une erreur est survenue, la génération de l'article a échoué. Veuillez réessayer.
     api_exception: Une erreur est survenue lors la génération de l'article. Veuillez réessayer.
+    api_no_models: Impossible de charger la liste des modèles pour la génération de l'article. Veuillez réessayer.
 
 app_articles_list:
   title: Vos articles

@@ -24,6 +24,11 @@ framework:
     scoped_clients:
       fast_api.client:
         base_uri: '%env(FASTAPI_URL)%'
+      aristote.client:
+        base_uri: '%env(ARISTOTE_DISPATCHER_URI)%'
+        headers:
+          Accept: 'application/json'
+          Authorization: 'Bearer %env(ARISTOTE_DISPATCHER_API_KEY)%'
 
 when@test:
   framework:

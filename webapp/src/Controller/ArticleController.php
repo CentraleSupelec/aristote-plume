@@ -27,6 +27,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -58,12 +59,25 @@ class ArticleController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         HttpClientInterface $fastApiClient,
+        HttpClientInterface $aristoteClient,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
         LoggerInterface $logger,
     ): Response {
         $article = (new Article())->setAuthor($user);
-        $form = $this->createForm(ArticleCreationType::class, $article);
+
+        $modelIds = [];
+        try {
+            $models = $aristoteClient->request('GET', 'v1/models')->toArray();
+            foreach ($models as $model) {
+                $modelIds[$model['id']] = $model['id'];
+            }
+        } catch (ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
+            $this->addFlash('danger', 'app_article_create.error.api_no_models');
+            $logger->error($e);
+        }
+
+        $form = $this->createForm(ArticleCreationType::class, $article, ['available_models' => $modelIds]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
