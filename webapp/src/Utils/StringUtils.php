@@ -17,4 +17,9 @@ class StringUtils
 
         return implode("\n", $formattedErrorMessage);
     }
+
+    public static function getEmailDomainFromAddress(string $email): string
+    {
+        return substr(strrchr($email, '@'), 1);
+    }
 }
