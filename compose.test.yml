@@ -1,0 +1,24 @@
+services:
+  php-test:
+    image: illuin/symfony-ready:8.4-node-22
+    working_dir: "/app"
+    entrypoint: ["/bin/bash", "/app/tests/init-test-database.sh"]
+    depends_on:
+      - postgres-test
+    volumes:
+      - "./webapp:/app:cached"
+    networks:
+      - test
+
+  postgres-test:
+    image: postgres:16
+    restart: on-failure
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: plume
+      POSTGRES_DB: plume-test
+    networks:
+      - test
+
+networks:
+  test:

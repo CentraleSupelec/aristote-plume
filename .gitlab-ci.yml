@@ -18,7 +18,7 @@ stages:
 
 .php_test_template: &php_test_template
   stage: tests
-  image: illuin/symfony-ready:8.2-node-20
+  image: illuin/symfony-ready:8.4-node-22
   tags:
     - docker
   before_script:
@@ -27,6 +27,18 @@ stages:
     - php /usr/bin/composer install -n
   except:
     - tags
+
+.php_e2e_test_template: &php_e2e_test_template
+  <<: *php_test_template
+  services:
+    - postgres:16
+  variables:
+    XDEBUG_MODE: coverage
+    POSTGRES_USER: test
+    POSTGRES_PASSWORD: plume
+    POSTGRES_DB: plume-test
+    DATABASE_URL: postgresql://test:plume@postgres:5432/plume-test?serverVersion=15&charset=utf8
+    LOCK_DSN: postgresql+advisory://test:plume@postgres:5432/plume-test
 
 .python_test_template: &python_test_template
   stage: tests
@@ -60,6 +72,22 @@ black:
   <<: *python_test_template
   script:
     - black src --check
+
+php_unit_tests:
+  <<: *php_test_template
+  script:
+    - php vendor/bin/phpunit --testsuite Unit --coverage-text
+
+php_application_tests:
+  <<: *php_e2e_test_template
+  before_script:
+    - echo "memory_limit = -1" > /usr/local/etc/php/conf.d/memory.ini
+    - php /usr/bin/composer install -n
+    - npm ci
+    - npm run build
+  script:
+    - sh tests/init-test-database.sh
+    - php vendor/bin/phpunit --testsuite Application --coverage-text
 
 .kaniko_build_template: &kaniko_build_template
   stage: build
