@@ -15,6 +15,7 @@ stages:
   - tests
   - build
   - images_scan
+  - test_coverage_report
 
 .php_test_template: &php_test_template
   stage: tests
@@ -56,7 +57,7 @@ stages:
 php_cs_fixer:
   <<: *php_test_template
   script:
-    - php vendor/bin/php-cs-fixer fix -v --dry-run
+    - PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix -v --dry-run
 
 rector:
   <<: *php_test_template
@@ -75,19 +76,69 @@ black:
 
 php_unit_tests:
   <<: *php_test_template
+  variables:
+    XDEBUG_MODE: coverage
   script:
-    - php vendor/bin/phpunit --testsuite Unit --coverage-text
+    # TODO: install and enable xdebug on base image
+    - pecl install xdebug
+    - docker-php-ext-enable xdebug
+    - php vendor/bin/phpunit --testsuite Unit --coverage-php=php-unit.cov --coverage-cobertura=php-unit.cobertura.xml
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - webapp/php-unit.cov
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: webapp/php-unit.cobertura.xml
 
 php_application_tests:
   <<: *php_e2e_test_template
   before_script:
     - echo "memory_limit = -1" > /usr/local/etc/php/conf.d/memory.ini
+    - cd webapp
     - php /usr/bin/composer install -n
     - npm ci
     - npm run build
   script:
+    # TODO: install and enable xdebug on base image
+    - pecl install xdebug
+    - docker-php-ext-enable xdebug
     - sh tests/init-test-database.sh
-    - php vendor/bin/phpunit --testsuite Application --coverage-text
+    - php vendor/bin/phpunit --testsuite Application --coverage-php=php-application.cov --coverage-cobertura=php-application.cobertura.xml
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - webapp/php-application.cov
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: webapp/php-application.cobertura.xml
+
+merge_coverage_reports:
+  <<: *php_test_template
+  stage: test_coverage_report
+  variables:
+    XDEBUG_MODE: coverage
+  dependencies:
+    - php_unit_tests
+    - php_application_tests
+  script:
+    # Collect artifacts from previous jobs in all-php-coverage-reports directory
+    # TODO: install and enable xdebug on base image, as well as other dependencies
+    - pecl install xdebug && docker-php-ext-enable xdebug
+    - apt-get update -q -y && apt-get install -q -y xmlstarlet bc wget
+    - mkdir /tools && cd /tools && wget https://phar.phpunit.de/phpcov.phar && cd - && php /tools/phpcov.phar --version
+    - mkdir all-php-coverage-reports
+    - cp php-application.cov all-php-coverage-reports/php-application.cov
+    - cp php-unit.cov all-php-coverage-reports/php-unit.cov
+    - php /tools/phpcov.phar merge --clover full-coverage-report.xml all-php-coverage-reports
+    - coverageMetrics=$(xmlstarlet sel -t -c "/coverage/project/metrics" full-coverage-report.xml)
+    - totalLines=$(echo $coverageMetrics | sed -nr 's/.* elements="([0-9]+)".*/\1/p')
+    - coveredLines=$(echo $coverageMetrics | sed -nr 's/.* coveredelements="([0-9]+)".*/\1/p')
+    - "echo -e Code coverage: $(echo \"scale=4; ($coveredLines / $totalLines) * 100\" | bc | head -c 5)% of line covered"
+  coverage: '/Code coverage: \d+(?:\.\d+)?/'
+
 
 .kaniko_build_template: &kaniko_build_template
   stage: build

@@ -33,11 +33,10 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-#[Route('/app')]
 #[IsGranted(PlumeUser::ROLE_DEFAULT)]
 class ArticleController extends AbstractController
 {
-    #[Route('/', name: 'articles_list')]
+    #[Route('/app', name: 'articles_list')]
     public function listArticles(
         ArticleRepository $articleRepository,
         PaginatorInterface $paginator,
@@ -53,7 +52,7 @@ class ArticleController extends AbstractController
         return $this->render('articles_list.html.twig', ['pagination' => $pagination]);
     }
 
-    #[Route('/create', name: 'article_create')]
+    #[Route('/app/create', name: 'article_create')]
     public function createArticle(
         #[CurrentUser] PlumeUser $user,
         Request $request,
@@ -119,14 +118,14 @@ class ArticleController extends AbstractController
         return $this->render('article_create.html.twig', ['form' => $form]);
     }
 
-    #[Route('/{id}/wait-for-generation', name: 'article_waiting_page')]
+    #[Route('/app/{id}/wait-for-generation', name: 'article_waiting_page')]
     #[IsGranted(ArticleVoter::USER_CAN_VIEW_ARTICLE, subject: 'article')]
     public function waitForArticleGeneration(Article $article): Response
     {
         return $this->render('article_waiting_page.html.twig', ['article' => $article]);
     }
 
-    #[Route('/{id}/check-for-status', name: 'article_check_status', options: ['expose' => true])]
+    #[Route('/app/{id}/check-for-status', name: 'article_check_status', options: ['expose' => true])]
     #[IsGranted(ArticleVoter::USER_CAN_VIEW_ARTICLE, subject: 'article')]
     public function checkArticleStatus(
         Article $article,
@@ -164,7 +163,7 @@ class ArticleController extends AbstractController
         }
     }
 
-    #[Route('/{id}/detail', name: 'article_detail_page', options: ['expose' => true])]
+    #[Route('/app/{id}/detail', name: 'article_detail_page', options: ['expose' => true])]
     #[IsGranted(ArticleVoter::USER_CAN_VIEW_ARTICLE, subject: 'article')]
     public function viewArticle(
         Article $article,

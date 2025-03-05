@@ -3,6 +3,8 @@ services:
     image: illuin/symfony-ready:8.4-node-22
     working_dir: "/app"
     entrypoint: ["/bin/bash", "/app/tests/init-test-database.sh"]
+    environment:
+      XDEBUG_MODE: coverage
     depends_on:
       - postgres-test
     volumes:
