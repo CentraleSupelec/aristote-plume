@@ -1,12 +1,15 @@
-FROM illuin/symfony-ready:8.2-node-20 AS assets_dev
+FROM illuin/symfony-ready:8.4-node-22 AS assets_dev
 
 WORKDIR /app
 
 ENV NODE_ENV=dev
 ENV PATH=/app/node_modules/.bin:$PATH
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache git python3 make g++
+RUN apt-get update -q -y \
+    && apt-get upgrade -q -y \
+    && apt-get install -q -y git python3 g++ \
+    && apt-get autoremove && apt-get autoclean \
+    && rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT  ["/bin/bash", "-c"]
 CMD ["npm install && npm run watch"]

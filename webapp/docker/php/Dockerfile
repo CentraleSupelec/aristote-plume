@@ -1,28 +1,27 @@
 ARG ASSETS_BUILD=assets
 FROM $ASSETS_BUILD AS assets-build
 
-FROM php:8.2-fpm-bullseye AS php_base
+FROM php:8.4-fpm-bookworm AS php_base
 
 USER root
-
-ENV EXT_AMQP_VERSION=v2.1.1
 
 RUN apt-get update -q -y \
     && apt-get upgrade -q -y \
     && curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash - \
     && apt-get install -q -y postgresql-client libcurl4-gnutls-dev zlib1g-dev libicu-dev g++ libxml2-dev libpq-dev \
-      libonig-dev libzip-dev libldb-dev libldap2-dev libpng-dev libjpeg62 libxrender-dev librabbitmq-dev \
-      software-properties-common nodejs git git-lfs unzip procps locales build-essential libmagickwand-dev \
-      libmagickcore-dev imagemagick ghostscript fcgiwrap symfony-cli \
+      libonig-dev libzip-dev libldb-dev libldap2-dev libfreetype-dev libjpeg62-turbo-dev libpng-dev libxrender-dev \
+      librabbitmq-dev software-properties-common git git-lfs unzip procps locales build-essential \
+      libmagickwand-dev libmagickcore-dev imagemagick ghostscript fcgiwrap symfony-cli \
     && apt-get autoremove && apt-get autoclean \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN docker-php-source extract && \
-    git clone --branch $EXT_AMQP_VERSION --depth 1 https://github.com/php-amqp/php-amqp.git /usr/src/php/ext/amqp && \
-    cd /usr/src/php/ext/amqp && git submodule update --init && \
-    pecl install redis && \
-    docker-php-ext-enable redis && \
-    docker-php-ext-install amqp intl mbstring pdo pdo_pgsql pdo_mysql zip bcmath sockets ldap gd opcache pcntl soap
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-source extract \
+    && pecl install redis \
+    && pecl install amqp \
+    && docker-php-ext-enable redis amqp \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install intl mbstring pdo pdo_pgsql pdo_mysql zip bcmath sockets ldap opcache pcntl soap \
+    && docker-php-source delete
 
 COPY docker/php/conf.d/docker-common.ini $PHP_INI_DIR/conf.d/docker-common.ini
 COPY docker/php/php-fpm.d/zz-docker-common.conf /usr/local/etc/php-fpm.d/zz-docker-common.conf

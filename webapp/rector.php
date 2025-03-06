@@ -31,8 +31,7 @@ return static function (RectorConfig $rectorConfig): void {
         DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
         SetList::DEAD_CODE,
         SetList::CODE_QUALITY,
-        //        SetList::NAMING,
-        LevelSetList::UP_TO_PHP_82,
+        LevelSetList::UP_TO_PHP_84,
         SymfonySetList::SYMFONY_64,
         SymfonySetList::SYMFONY_CODE_QUALITY,
     ]);
