@@ -79,9 +79,6 @@ php_unit_tests:
   variables:
     XDEBUG_MODE: coverage
   script:
-    # TODO: install and enable xdebug on base image
-    - pecl install xdebug
-    - docker-php-ext-enable xdebug
     - php vendor/bin/phpunit --testsuite Unit --coverage-php=php-unit.cov --coverage-cobertura=php-unit.cobertura.xml
   artifacts:
     expire_in: 1 week
@@ -101,9 +98,6 @@ php_application_tests:
     - npm ci
     - npm run build
   script:
-    # TODO: install and enable xdebug on base image
-    - pecl install xdebug
-    - docker-php-ext-enable xdebug
     - sh tests/init-test-database.sh
     - php vendor/bin/phpunit --testsuite Application --coverage-php=php-application.cov --coverage-cobertura=php-application.cobertura.xml
   artifacts:
@@ -125,10 +119,6 @@ merge_coverage_reports:
     - php_application_tests
   script:
     # Collect artifacts from previous jobs in all-php-coverage-reports directory
-    # TODO: install and enable xdebug on base image, as well as other dependencies
-    - pecl install xdebug && docker-php-ext-enable xdebug
-    - apt-get update -q -y && apt-get install -q -y xmlstarlet bc wget
-    - mkdir /tools && cd /tools && wget https://phar.phpunit.de/phpcov.phar && cd - && php /tools/phpcov.phar --version
     - mkdir all-php-coverage-reports
     - cp php-application.cov all-php-coverage-reports/php-application.cov
     - cp php-unit.cov all-php-coverage-reports/php-unit.cov
