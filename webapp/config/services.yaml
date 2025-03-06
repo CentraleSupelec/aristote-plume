@@ -50,3 +50,4 @@ services:
   App\Security\PlumeUser\PlumeUserProvider:
     arguments:
       $autoCreateAccount: '%env(bool:AUTO_CREATE_USER_ACCOUNT)%'
+      $allowedEmailDomains: '%env(csv:ALLOWED_EMAIL_DOMAINS)%'

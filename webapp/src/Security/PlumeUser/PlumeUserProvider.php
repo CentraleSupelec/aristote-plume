@@ -4,6 +4,7 @@ namespace App\Security\PlumeUser;
 
 use App\Entity\PlumeUser;
 use App\Repository\PlumeUserRepository;
+use App\Utils\StringUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Drenso\OidcBundle\Exception\OidcException;
 use Drenso\OidcBundle\Model\OidcUserData;
@@ -20,6 +21,7 @@ readonly class PlumeUserProvider implements OidcUserProviderInterface
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator,
         private bool $autoCreateAccount = false,
+        private array $allowedEmailDomains = [],
     ) {
     }
 
@@ -48,11 +50,15 @@ readonly class PlumeUserProvider implements OidcUserProviderInterface
 
         if (!$plumeUser instanceof PlumeUser) {
             if ($this->autoCreateAccount) {
+                $emailDomain = StringUtils::getEmailDomainFromAddress($identifier);
+                if ([] !== $this->allowedEmailDomains && !in_array($emailDomain, $this->allowedEmailDomains, true)) {
+                    throw new UserNotFoundException(sprintf('[PlumeUser] User with email "%s" does not exist and could not be created (domain not allowed).', $identifier));
+                }
                 $plumeUser = (new PlumeUser())->setEmail($identifier)->setEnabled(true);
 
                 $errors = $this->validator->validate($plumeUser);
                 if (count($errors) > 0) {
-                    throw new UserNotFoundException(sprintf('[PlumeUser] User with email "%s" does not exist and could not be created.', $identifier));
+                    throw new UserNotFoundException(sprintf('[PlumeUser] User with email "%s" does not exist and could not be created (invalid).', $identifier));
                 }
 
                 $this->entityManager->persist($plumeUser);
