@@ -1,6 +1,9 @@
-from knowledge_storm.storm_wiki.modules.article_generation import ConvToSection
+from knowledge_storm.storm_wiki.modules.article_generation import (
+    ConvToSection,
+    WriteSection,
+)
 import dspy
-from src.article_generation.plume_write_section import PlumeWriteSection
+from src.model.class_docstrings import WRITE_SECTION_DOCSTRING
 from src.model.language import LANGUAGES
 
 
@@ -9,13 +12,13 @@ class PlumeConvToSection(ConvToSection):
         super().__init__(*args, **kwargs)
         language_params = LANGUAGES.get(language)
 
-        PlumeWriteSection.__doc__ = PlumeWriteSection.__doc__.format(
+        WriteSection.__doc__ = WRITE_SECTION_DOCSTRING.format(
             language=language_params.name, write_prompt=language_params.write_prompt
         )
         # pylint: disable=line-too-long
-        PlumeWriteSection.output = dspy.OutputField(
+        WriteSection.output = dspy.OutputField(
             prefix=f"Write the section with proper inline citations (Start your writing with # section title. Don't include the page title or try to write other sections), generate the section in {language_params.name}:\n",
             format=str,
         )
 
-        self.write_section = dspy.Predict(PlumeWriteSection)
+        self.write_section = dspy.Predict(WriteSection)

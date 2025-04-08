@@ -1,8 +1,13 @@
-from knowledge_storm.storm_wiki.modules.article_polish import PolishPageModule
+from knowledge_storm.storm_wiki.modules.article_polish import (
+    PolishPage,
+    PolishPageModule,
+    WriteLeadSection,
+)
 import dspy
-from src.article_generation.plume_polish_page import PlumePolishPage
-from src.article_generation.plume_write_lead_section import PlumeWriteLeadSection
-
+from src.model.class_docstrings import (
+    WRITE_LEAD_SECTION_DOCSTRING,
+    POLISH_PAGE_DOCSTRING,
+)
 from src.model.language import LANGUAGES
 
 
@@ -11,12 +16,12 @@ class PlumePolishPageModule(PolishPageModule):
         super().__init__(*args, **kwargs)
         language_params = LANGUAGES.get(language)
 
-        PlumeWriteLeadSection.__doc__ = PlumeWriteLeadSection.__doc__.format(
+        WriteLeadSection.__doc__ = WRITE_LEAD_SECTION_DOCSTRING.format(
             language=language_params.name, write_prompt=language_params.write_prompt
         )
-        PlumePolishPage.__doc__ = PlumePolishPage.__doc__.format(
+        PolishPage.__doc__ = POLISH_PAGE_DOCSTRING.format(
             language=language_params.name, write_prompt=language_params.write_prompt
         )
 
-        self.write_lead = dspy.Predict(PlumeWriteLeadSection)
-        self.polish_page = dspy.Predict(PlumePolishPage)
+        self.write_lead = dspy.Predict(WriteLeadSection)
+        self.polish_page = dspy.Predict(PolishPage)
