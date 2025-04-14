@@ -51,7 +51,7 @@ class Article
     #[ORM\JoinColumn(nullable: false)]
     private ?PlumeUser $author = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT, nullable: false)]
     #[Assert\NotBlank(allowNull: false)]
     #[Groups([self::CREATION_REQUEST_GROUP, self::WAIT_FOR_GENERATION_GROUP])]
     private ?string $requestedTopic = null;
