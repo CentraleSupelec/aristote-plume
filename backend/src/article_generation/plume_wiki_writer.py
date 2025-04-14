@@ -1,9 +1,6 @@
-from knowledge_storm import WikiWriter
+from knowledge_storm import WikiWriter, AskQuestionWithPersona
 import dspy
-from src.article_generation.plume_ask_question_with_persona import (
-    PlumeAskQuestionWithPersona,
-)
-
+from src.model.class_docstrings import ASK_QUESTION_WITH_PERSONA_DOCSTRING
 from src.model.language import LANGUAGES
 
 
@@ -12,11 +9,7 @@ class PlumeWikiWriter(WikiWriter):
         super().__init__(*args, **kwargs)
         language_params = LANGUAGES.get(language)
 
-        PlumeAskQuestionWithPersona.__doc__ = (
-            PlumeAskQuestionWithPersona.__doc__.format(
-                language=language_params.name, ask_prompt=language_params.ask_prompt
-            )
+        AskQuestionWithPersona.__doc__ = ASK_QUESTION_WITH_PERSONA_DOCSTRING.format(
+            language=language_params.name, ask_prompt=language_params.ask_prompt
         )
-        self.ask_question_with_persona = dspy.ChainOfThought(
-            PlumeAskQuestionWithPersona
-        )
+        self.ask_question_with_persona = dspy.ChainOfThought(AskQuestionWithPersona)

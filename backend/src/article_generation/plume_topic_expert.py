@@ -1,8 +1,9 @@
-from knowledge_storm import TopicExpert
+from knowledge_storm import AnswerQuestion, TopicExpert, QuestionToQuery
 import dspy
-from src.article_generation.plume_answer_question import PlumeAnswerQuestion
-from src.article_generation.plume_question_to_query import PlumeQuestionToQuery
-
+from src.model.class_docstrings import (
+    QUESTION_TO_QUERY_DOCSTRING,
+    ANSWER_QUESTION_DOCSTRING,
+)
 from src.model.language import LANGUAGES
 
 
@@ -11,12 +12,12 @@ class PlumeTopicExpert(TopicExpert):
         super().__init__(*args, **kwargs)
         language_params = LANGUAGES.get(language)
 
-        PlumeQuestionToQuery.__doc__ = PlumeQuestionToQuery.__doc__.format(
+        QuestionToQuery.__doc__ = QUESTION_TO_QUERY_DOCSTRING.format(
             language=language_params.name, search_prompt=language_params.search_prompt
         )
-        PlumeAnswerQuestion.__doc__ = PlumeAnswerQuestion.__doc__.format(
+        AnswerQuestion.__doc__ = ANSWER_QUESTION_DOCSTRING.format(
             language=language_params.name, respond_prompt=language_params.respond_prompt
         )
 
-        self.generate_queries = dspy.Predict(PlumeQuestionToQuery)
-        self.answer_question = dspy.Predict(PlumeAnswerQuestion)
+        self.generate_queries = dspy.Predict(QuestionToQuery)
+        self.answer_question = dspy.Predict(AnswerQuestion)
